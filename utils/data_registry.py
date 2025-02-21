@@ -37,9 +37,11 @@ class DataRegistry:
                 "merged_gameweek_data": "./data/2023-24/merged_gw.csv"
             }
         }
+        self.seasons = list(self.file_paths.keys())
         self.gameweek_data = {}
         self.player_data = {}
         self.load_gameweek_data()
+        self.standardize_data()
 
     def load_gameweek_data(self) -> None:
         """ Use ISO-8859-1 file encoding to load seasonal gameweek and player data into the registry. """
@@ -51,3 +53,43 @@ class DataRegistry:
                 self.player_data[season] = pd.read_csv(player_file_path, encoding="ISO-8859-1")
             except UnicodeDecodeError:
                 raise Exception(f"Error loading data for {season}")
+    
+    def _standardize_player_names(self) -> None:
+        """ 
+            Standardize player names in gameweek data to match those in player data. 
+            - 2019/20 and 2018/19 merged_gw.csv files have player names in the format "First_Last_ID"
+            - 2017/18 and 2016/17 merged_gw.csv files have player names in the format "First_Last"
+            - We need to standardize these names to match this format "First Last"
+        """
+        for season, gameweek_pd in self.gameweek_data.items():
+            if season in ["2016-17", "2017-18"]:
+                gameweek_pd["name"] = gameweek_pd["name"].apply(lambda x: " ".join(x.split("_")))
+            elif season in ["2018-19", "2019-20"]:
+                gameweek_pd["name"] = gameweek_pd["name"].apply(lambda x: " ".join(x.split("_")[:-1]))
+
+    def _standardize_player_starts_sub_unused_data(self) -> None:
+        """
+            - Add one columns to each "merged_gw_csv" that show if a player started a match
+            - 2016/17 - 2021/22 seasons only have data on player minutes
+                - Assumption: Player started the game if he played >=50 minutes. Therefore, they got subbed into the match if they played < 50 minutes.
+        """
+        seasons_not_to_edit = {"2022-23", "2023-24"}
+        for season, gameweek_pd in self.gameweek_data.items():
+            if season not in seasons_not_to_edit:
+                gameweek_pd["starts"] = gameweek_pd["minutes"].apply(lambda x: 1 if x >= 50 else 0)
+        return
+
+    def standardize_data(self) -> None:
+        """
+            - Standardize names and minutes played format for players in gameweek data and save the result
+        """
+        self._standardize_player_names()
+        self._standardize_player_starts_sub_unused_data()
+        for season, file_path_dict in self.file_paths.items():
+            output_file_path = file_path_dict["merged_gameweek_data"]
+            self.gameweek_data[season].to_csv(output_file_path, index=False)
+        print("Standardized gameweek data saved to csv!")
+        return
+        
+        
+    

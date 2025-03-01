@@ -41,7 +41,8 @@ class DataRegistry:
         self.gameweek_data = {}
         self.player_data = {}
         self.load_gameweek_data()
-        self.standardize_data()
+        # Script to clean up the data - player names and starting stats
+        # self.standardize_data()
 
     def load_gameweek_data(self) -> None:
         """ Use ISO-8859-1 file encoding to load seasonal gameweek and player data into the registry. """

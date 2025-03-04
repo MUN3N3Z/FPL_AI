@@ -62,11 +62,11 @@ class DataRegistry:
             - 2017/18 and 2016/17 merged_gw.csv files have player names in the format "First_Last"
             - We need to standardize these names to match this format "First Last"
         """
-        for season, gameweek_pd in self.gameweek_data.items():
+        for season, gameweek_df in self.gameweek_data.items():
             if season in ["2016-17", "2017-18"]:
-                gameweek_pd["name"] = gameweek_pd["name"].apply(lambda x: " ".join(x.split("_")))
+                gameweek_df["name"] = gameweek_df["name"].apply(lambda x: " ".join(x.split("_")))
             elif season in ["2018-19", "2019-20"]:
-                gameweek_pd["name"] = gameweek_pd["name"].apply(lambda x: " ".join(x.split("_")[:-1]))
+                gameweek_df["name"] = gameweek_df["name"].apply(lambda x: " ".join(x.split("_")[:-1]))
 
     def _standardize_player_starts_sub_unused_data(self) -> None:
         """
@@ -75,17 +75,29 @@ class DataRegistry:
                 - Assumption: Player started the game if he played >=50 minutes. Therefore, they got subbed into the match if they played < 50 minutes.
         """
         seasons_not_to_edit = {"2022-23", "2023-24"}
-        for season, gameweek_pd in self.gameweek_data.items():
+        for season, gameweek_df in self.gameweek_data.items():
             if season not in seasons_not_to_edit:
-                gameweek_pd["starts"] = gameweek_pd["minutes"].apply(lambda x: 1 if x >= 50 else 0)
+                gameweek_df["starts"] = gameweek_df["minutes"].apply(lambda x: 1 if x >= 50 else 0)
         return
 
+    def _standardize_player_positions(self) -> None:
+        """
+            - Annoyingly discovered that there the goalkeeper position in the "positions" column in <season>/merged_gw.csv is not uniform
+                - Solution: replace "GKP" with "GK"
+            - Standard position names: ['FWD' 'DEF' 'MID' 'GK']
+        """
+        seasons_with_player_position_data = {"2020-21", "2021-22", "2022-23"}
+        for season, gameweek_df in self.gameweek_data.items(): 
+            if season in seasons_with_player_position_data:
+                gameweek_df["position"] = gameweek_df["position"].replace("GKP", "GK")
+        return
     def standardize_data(self) -> None:
         """
             - Standardize names and minutes played format for players in gameweek data and save the result
         """
         self._standardize_player_names()
         self._standardize_player_starts_sub_unused_data()
+        self._standardize_player_positions()
         for season, file_path_dict in self.file_paths.items():
             output_file_path = file_path_dict["merged_gameweek_data"]
             self.gameweek_data[season].to_csv(output_file_path, index=False)

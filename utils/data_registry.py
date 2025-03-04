@@ -37,7 +37,6 @@ class DataRegistry:
                 "merged_gameweek_data": "./data/2023-24/merged_gw.csv"
             }
         }
-        self.seasons = list(self.file_paths.keys())
         self.gameweek_data = {}
         self.player_data = {}
         self.load_gameweek_data()

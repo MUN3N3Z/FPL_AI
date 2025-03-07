@@ -1,9 +1,10 @@
 import pandas as pd
+from typing import Dict
 
 class DataRegistry:
     """ A class to manage loading and storage of FPL data from CSV files. """
     def __init__(self):
-        self.file_paths = {
+        self.file_paths: Dict[str, Dict[str, str]] = {
             "2016-17" : {
                 "player_data": "./data/2016-17/cleaned_players.csv",
                 "merged_gameweek_data": "./data/2016-17/merged_gw.csv"
@@ -37,8 +38,8 @@ class DataRegistry:
                 "merged_gameweek_data": "./data/2023-24/merged_gw.csv"
             }
         }
-        self.gameweek_data = {}
-        self.player_data = {}
+        self.gameweek_data: Dict[str, pd.DataFrame] = {}
+        self.player_data: Dict[str, pd.DataFrame] = {}
         self.load_gameweek_data()
         # Script to clean up the data - player names and starting stats
         # self.standardize_data()

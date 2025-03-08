@@ -1,4 +1,4 @@
-from utils.utils import get_fixtures
+from utils import get_fixtures 
 from fpl.models import Fixture, Player
 from typing import List
 import pandas as pd

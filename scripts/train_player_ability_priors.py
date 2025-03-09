@@ -23,7 +23,7 @@ def train_player_ability_priors():
     # - ψ (psi): Assist making ability (Beta prior)
     player_ability_df = pd.DataFrame({
         "name": seasonal_gameweek_player_data.player_data["2023-24"]["first_name"] + " " + seasonal_gameweek_player_data.player_data["2023-24"]["second_name"],
-        "ρ_β": [np.array([0.25, 0.25, 0.5])] * len(seasonal_gameweek_player_data.player_data["2023-24"]), # Dirichlet prior for ρ
+        "ρ_β": [np.array([0, 0, 0])] * len(seasonal_gameweek_player_data.player_data["2023-24"]), # Dirichlet prior for ρ
         "ω_α": np.ones(len(seasonal_gameweek_player_data.player_data["2023-24"])), # Beta prior for ω
         "ω_β": np.ones(len(seasonal_gameweek_player_data.player_data["2023-24"])), # Beta prior for ω
         "ψ_α": np.ones(len(seasonal_gameweek_player_data.player_data["2023-24"])), # Beta prior for ψ
@@ -48,7 +48,6 @@ def train_player_ability_priors():
         print(f"Season: {season}; matched players: {len(grouped_data['name'].unique())}")
         count = 0
         for (player_name,), player_gameweek_data in grouped_data:
-            print(f"Processing player: {player_name}")
             ρ_observed = np.array(player_gameweek_data.apply(
                 lambda row: [1, 0, 0] if row["starts"] == 1 else [0, 1, 0] if row["minutes"] > 0 else [0, 0, 1],
                 axis=1
@@ -58,7 +57,6 @@ def train_player_ability_priors():
             total_gameweeks_played = len(player_gameweek_data)
             # Conjugate prior updates
             # Dirichlet prior update for ρ
-            print(ρ_observed)
             player_priors[player_name]["ρ_β"] += ρ_observed
             # Beta prior update for ω
             player_priors[player_name]["ω_α"] += ω_observed
@@ -67,11 +65,11 @@ def train_player_ability_priors():
             player_priors[player_name]["ψ_α"] += ψ_observed
             player_priors[player_name]["ψ_β"] += (total_gameweeks_played - ψ_observed)
             count += 1
-            print(f"{count}/{len(gameweek_data_df)}")
 
     # Update player_ability_df with the updated priors from player_priors
     for player_name, priors in player_priors.items():
-        player_ability_df.loc[player_ability_df["name"] == player_name, "ρ_β"].iloc[0] = [priors["ρ_β"]]
+        # Unable to perf
+        player_ability_df.loc[player_ability_df["name"] == player_name, "ρ_β"]  = player_ability_df.loc[player_ability_df["name"] == player_name, "ρ_β"].apply(lambda x: x + priors["ρ_β"])
         player_ability_df.loc[player_ability_df["name"] == player_name, "ω_α"] = priors["ω_α"]
         player_ability_df.loc[player_ability_df["name"] == player_name, "ω_β"] = priors["ω_β"]
         player_ability_df.loc[player_ability_df["name"] == player_name, "ψ_α"] = priors["ψ_α"]

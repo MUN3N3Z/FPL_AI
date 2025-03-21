@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import sys
 from data_registry import DataRegistry
-from utils import team_converter
+from utils import team_converter, np_array_to_list
+
 def train_player_ability_priors():
     """
         Updates ability priors for players in the 2023/24 season using historical gameweek data.
@@ -27,6 +28,7 @@ def train_player_ability_priors():
     season_2023_24_gameweek_data_unique_player_rows = seasonal_gameweek_player_data.gameweek_data.pop("2023-24").drop_duplicates(subset=["name"])
     player_ability_df = pd.DataFrame({
         "name": season_2023_24_gameweek_data_unique_player_rows["name"],
+        "position": season_2023_24_gameweek_data_unique_player_rows["position"],
         "team": None,
         "ρ_β": [np.array([0, 0, 0])] * len(season_2023_24_gameweek_data_unique_player_rows), # Dirichlet prior for ρ
         "ω_α": np.ones(len(season_2023_24_gameweek_data_unique_player_rows)), # Beta prior for ω
@@ -47,7 +49,7 @@ def train_player_ability_priors():
         for player_name in player_ability_df["name"]
     }
     for season, gameweek_data_df in seasonal_gameweek_player_data.gameweek_data.items():
-        gameweek_data_df = gameweek_data_df.filter(items=["name", "minutes", "starts", "goals_scored", "assists"])
+        gameweek_data_df = gameweek_data_df.filter(items=["name", "minutes", "starts", "goals_scored", "assists", "position"])
         # Filter out players not present in the 2023/24 season
         gameweek_data_df = gameweek_data_df[gameweek_data_df["name"].isin(player_ability_df["name"])]
         grouped_data = gameweek_data_df.groupby(["name"])
@@ -83,7 +85,7 @@ def train_player_ability_priors():
         player_ability_df.loc[player_ability_df["name"] == player_name, "ψ_α"] = priors["ψ_α"]
         player_ability_df.loc[player_ability_df["name"] == player_name, "ψ_β"] = priors["ψ_β"]
     # Convert "ρ_β" column from np.array type to list for accurate loading
-    player_ability_df["ρ_β"] = player_ability_df["ρ_β"].apply(lambda np_array: str(np_array.tolist()))
+    player_ability_df["ρ_β"] = player_ability_df["ρ_β"].apply(np_array_to_list)
     # Save player_ability_df as a csv file
     player_ability_df.to_csv(path_or_buf="./data/2023-24/player_ability.csv", index=False)
     return 

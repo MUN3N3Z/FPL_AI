@@ -1,3 +1,5 @@
+import numpy as np
+
 def team_converter(team_name: str) -> int:
     """ Converts a team's name to their id for the 2023/24 season """
     team_map = {
@@ -24,3 +26,9 @@ def team_converter(team_name: str) -> int:
         None: None
         }
     return team_map[team_name]
+
+def np_array_to_list(np_array: np.array) -> str:
+    return str(np_array.tolist())
+
+def string_list_to_np_array(string_list: str) -> np.array:
+    return np.array(eval(string_list))

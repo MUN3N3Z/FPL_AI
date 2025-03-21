@@ -1,6 +1,7 @@
 from data_registry import DataRegistry
 import numpy as np
 import pandas as pd
+from utils import np_array_to_list
 
 def train_player_position_minutes_priors():
     """
@@ -33,6 +34,8 @@ def train_player_position_minutes_priors():
     # Transfer priors to player_position_minutes_df
     for position, priors in position_priors.items():
         player_position_minutes_df.loc[player_position_minutes_df["position"] == position, "minutes"] = [priors]
+    # Convert "minutes" column from np.array type to list for accurate loading
+    player_position_minutes_df["minutes"] = player_position_minutes_df["minutes"].apply(func=np_array_to_list)
     # Save player_position_minutes_df as a csv file
     player_position_minutes_df.to_csv(path_or_buf="./data/player_position_minutes.csv", index=False)
     return 

@@ -1,14 +1,10 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"python.pythonPath": "/Users/munene/miniconda3/envs/pymc_env/bin/python3",
-        "python.analysis.extraPaths": [
-            "${workspaceFolder}",
-			"${workspaceFolder}/utils"
-        ],
-	}
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "python.envFile": "${workspaceFolder}/.env"
+    }
 }

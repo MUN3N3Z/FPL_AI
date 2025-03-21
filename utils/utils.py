@@ -1,6 +1,5 @@
-
 def team_converter(team_name: str) -> int:
-    """Converts a team's name to their id."""
+    """ Converts a team's name to their id for the 2023/24 season """
     team_map = {
         "Arsenal": 1,
         "Aston Villa": 2,

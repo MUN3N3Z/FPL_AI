@@ -11,8 +11,12 @@ def save_season_results(season_start_year: str) -> None:
     file_system_season_repr = season_start_year + "-" + str(int(season_start_year[-2:]) + 1)
     csv_storage_path = f"../data/{file_system_season_repr}/fixture_results.csv"
     data = pd.read_csv(filepath_or_buffer=url)
+    # Cleaning
     data = data[["HomeTeam", "AwayTeam", "FTHG", "FTAG"]]
     data = data.rename(columns={"FTHG": "HomeGoals", "FTAG": "AwayGoals"})
+    replacements = {"Man United": "Man Utd", "Tottenham": "Spurs"}
+    data.replace({"HomeTeam": replacements, "AwayTeam": replacements}, inplace=True)
+
     data.to_csv(path_or_buf=csv_storage_path, index=False)
 
 if __name__ == "__main__":

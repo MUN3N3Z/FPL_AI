@@ -1,9 +1,9 @@
-from fpl.models import Fixture, Player
-from typing import List
 import pandas as pd
 import pymc as pm
 import numpy as np
-from utils import string_list_to_np_array
+from utils import string_list_to_np_array, id_to_team_converter_2023_24
+from dixon_coles import DixonColesModel
+
 
 NUM_SAMPLES = 5000
 BURN_SAMPLES = 1000
@@ -79,7 +79,7 @@ def sample_players_minutes_played(starting_lineup: pd.DataFrame, position_minute
     return starting_lineup_with_minutes_played
 
 
-def simulate_fixture(fixture: pd.Series, players_ability_df: pd.DataFrame, position_minutes: pd.DataFrame) -> pd.DataFrame:
+def simulate_fixture(fixture: pd.Series, players_ability_df: pd.DataFrame, position_minutes: pd.DataFrame, match_score_matrix) -> pd.DataFrame:
     """ 
         - 
     """
@@ -118,9 +118,17 @@ def simulate_gameweek(season_start_year: str, gameweek: str) -> pd.DataFrame:
 
     position_minutes_file_path = "./data/player_position_minutes.csv"
     position_minutes_df = pd.read_csv(filepath_or_buffer=position_minutes_file_path)
+    # Prediction model
+    dixon_coles_prediction_model = DixonColesModel()
     
     for _, fixture_row in fixtures_df.iterrows():
-        simulate_fixture(fixture_row, players_ability_df, position_minutes_df)
+        match_score_matrix = dixon_coles_prediction_model.simulate_match(
+            season_start_year=season_start_year,
+            homeTeam=id_to_team_converter_2023_24(fixture_row["home_team"]),
+            awayTeam=id_to_team_converter_2023_24(fixture_row["away_team"]),
+            gameweek=int(gameweek)
+        )
+        simulate_fixture(fixture_row, players_ability_df, position_minutes_df, match_score_matrix)
         break
     return None
 

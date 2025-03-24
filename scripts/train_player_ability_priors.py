@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 from data_registry import DataRegistry
-from utils import team_converter, np_array_to_list
+from utils import team_to_id_converter_2023_24, np_array_to_list
 
 def train_player_ability_priors():
     """
@@ -56,7 +56,7 @@ def train_player_ability_priors():
         print(f"Season: {season}; matched players: {len(grouped_data['name'].unique())}")
         for (player_name,), player_gameweek_data in grouped_data:
             if player_priors[player_name]["team"] is None:
-                player_priors[player_name]["team"] = team_converter(
+                player_priors[player_name]["team"] = team_to_id_converter_2023_24(
                     season_2023_24_gameweek_data_unique_player_rows.loc[season_2023_24_gameweek_data_unique_player_rows["name"] == player_name, "team"].values[0]
                 )
             ρ_observed = np.array(player_gameweek_data.apply(

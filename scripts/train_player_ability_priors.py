@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import sys
 from data_registry import DataRegistry
 from utils import team_to_id_converter_2023_24, np_array_to_list
 

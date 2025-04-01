@@ -2,68 +2,70 @@ import pandas as pd
 import pymc as pm
 import numpy as np
 from numpy.typing import NDArray
-from utils import string_list_to_np_array, id_to_team_converter_2023_24, position_score_points_map, position_clean_sheet_points_map, random_bool
+from utils import (
+    string_list_to_np_array, 
+    id_to_team_converter_2023_24, 
+    position_score_points_map, 
+    position_clean_sheet_points_map, 
+    random_bool,
+    format_season_name
+)
 from dixon_coles import DixonColesModel
 import os
-
-RANDOM_SEED = 19
-
-NUM_SAMPLES = 5000
-BURN_SAMPLES = 500
-CHAINS = 4
-TARGET_ACCEPT = 0.9
-
-STARTING_PLAYERS = 11
-MATCH_MINUTES = 90
-MINUTES_THRESHOLD_FOR_FULL_PARTICIPATION_POINTS = 60
-ASSIST_POINTS = 3
-HALF_GAME_MINUTES = 45
-
-DATA_FOLDER = "../data"
-PLAYER_ABILITY_FILE = "player_ability.csv"
-POSITION_MINUTES_FILE = "player_position_minutes.csv"
-FIXTURE_FILE = "fixtures.csv"
+from constants import (
+    NUM_SAMPLES, 
+    BURN_SAMPLES, 
+    CHAINS, 
+    TARGET_ACCEPT, 
+    MATCH_MINUTES, 
+    MINUTES_THRESHOLD_FOR_FULL_PARTICIPATION_POINTS, 
+    HALF_GAME_MINUTES, 
+    RANDOM_SEED, 
+    STARTING_PLAYERS, 
+    DATA_FOLDER, 
+    PLAYER_ABILITY_FILE, 
+    ASSIST_POINTS
+)
 
 def sample_player_stats(team_players_abilities: pd.DataFrame) -> pd.DataFrame:
     """
-        - Sample each player's probability of starting a game, scoring a goal, and assisting one from their priors
+        - Sample each player's probability of starting a game, scoring a goal, and assisting one from their priors in a vectorized manner
         - Returns the team's players' abilities data frame with additional columns that contain the respective stats
     """
-    sampled_data = []
     # Convert the 'ρ_β' column from string to NumPy arrays
-    team_players_abilities = team_players_abilities.copy()
-    team_players_abilities["ρ_β"] = team_players_abilities["ρ_β"].apply(string_list_to_np_array)
-    for _, player_row in team_players_abilities.iterrows():
-        with pm.Model() as player_match_model:
-            # Define the distributions
-            # Enforced a minimum value i.e. 1e-3 for alpha and beta values to ensure they're always positive
-            pm.Dirichlet("start_sub_unused_dirichlet_dist", a=player_row["ρ_β"])
-            pm.Beta("score_beta", alpha=max(player_row["ω_α"], 1e-3), beta=max(player_row["ω_β"], 1e-3))
-            pm.Beta("assist_beta", alpha=max(player_row["ψ_α"], 1e-3), beta=max(player_row["ψ_β"], 1e-3))
-            # Sample from the distributions
-            trace = pm.sample(
-                draws=NUM_SAMPLES, 
-                tune=BURN_SAMPLES, 
-                chains=CHAINS, 
-                return_inferencedata=True, 
-                target_accept=TARGET_ACCEPT
-            )
+    team_players_abilities.loc[:, "ρ_β"] = team_players_abilities["ρ_β"].apply(string_list_to_np_array)
+    with pm.Model():
+        # Fromat priors for sampling
+        # Enforced a minimum value i.e. 1e-3 for alpha and beta values to ensure they're always positive
+        dirichlet_alphas = np.stack(team_players_abilities["ρ_β"].values)
+        score_alphas = np.maximum(team_players_abilities["ω_α"].values, 1e-3)
+        score_betas = np.maximum(team_players_abilities["ω_β"].values, 1e-3)
+        assist_alphas = np.maximum(team_players_abilities["ψ_α"].values, 1e-3)
+        assist_betas = np.maximum(team_players_abilities["ψ_β"].values, 1e-3)
+        # Define the distributions
+        pm.Dirichlet("start_sub_unused_dirichlet_dist", a=dirichlet_alphas, shape=(len(team_players_abilities), 3))
+        pm.Beta("score_beta", alpha=score_alphas, beta=score_betas, shape=len(team_players_abilities))
+        pm.Beta("assist_beta", alpha=assist_alphas, beta=assist_betas, shape=len(team_players_abilities))
+        # Sample from the distributions
+        prior_samples = pm.sample_prior_predictive(samples=NUM_SAMPLES)
         # Extract samples
-        start_sub_unused_dirichlet_samples = trace.posterior["start_sub_unused_dirichlet_dist"].mean(dim=["chain", "draw"]).values
-        score_beta_sample = trace.posterior["score_beta"].mean(dim=["chain", "draw"]).values
-        assist_beta_sample = trace.posterior["assist_beta"].mean(dim=["chain", "draw"]).values
-        # Append the sampled data
-        sampled_data.append({
-            "name": player_row["name"],
-            "start_prob": start_sub_unused_dirichlet_samples[0],
-            "sub_prob": start_sub_unused_dirichlet_samples[1],
-            "unused_prob": start_sub_unused_dirichlet_samples[2],
-            "score_prob": score_beta_sample,
-            "assist_prob": assist_beta_sample,
-        })
-    # Convert the sampled data into a DataFrame and merge it with the original team data frame
-    sampled_team_stats = pd.DataFrame(sampled_data)
-    team_players_abilities_with_stats = team_players_abilities.merge(right=sampled_team_stats, how="inner", on="name")
+        start_sub_unused_dirichlet_samples = prior_samples.prior["start_sub_unused_dirichlet_dist"].mean(dim=["chain", "draw"]).values
+        score_beta_samples = prior_samples.prior["score_beta"].mean(dim=["chain", "draw"]).values
+        assist_beta_samples = prior_samples.prior["assist_beta"].mean(dim=["chain", "draw"]).values
+    # Append the sampled data
+    sampled_data = pd.DataFrame({
+        "name": team_players_abilities["name"].values,
+        "start_prob": start_sub_unused_dirichlet_samples[:, 0],
+        "sub_prob": start_sub_unused_dirichlet_samples[:, 1],
+        "unused_prob": start_sub_unused_dirichlet_samples[:, 2],
+        "score_prob": score_beta_samples,
+        "assist_prob": assist_beta_samples,
+    })
+    team_players_abilities_with_stats = team_players_abilities.merge(
+        right=sampled_data, 
+        how="inner", 
+        on="name"
+    )
     return team_players_abilities_with_stats
 
 def sample_players_minutes_played(starting_lineup: pd.DataFrame, position_minutes_df: pd.DataFrame) -> pd.DataFrame:
@@ -71,34 +73,37 @@ def sample_players_minutes_played(starting_lineup: pd.DataFrame, position_minute
         - Sample the minute at which each player in the starting lineup leaves the pitch from the global Dirichlet distribution 'position_minutes_df'
         - Returns a pd.DataFrame with a new "minutes_played" column
     """
-    sampled_data = []
-    # Convert the 'minutes' column from string to NumPy arrays
-    position_minutes_df.loc[:,"minutes"] = position_minutes_df["minutes"].apply(string_list_to_np_array) 
     position_minutes_df.index = position_minutes_df["position"]
+    player_minutes_alphas = np.array(
+        [string_list_to_np_array(position_minutes_df.loc[position, "minutes"]) 
+        for position in starting_lineup["position"].values
+    ])
 
-    for _, player_row in starting_lineup.iterrows():
-        with pm.Model():
-            pm.Dirichlet(
-                "minutes_played", 
-                a=position_minutes_df.loc[player_row["position"], "minutes"]
-            )
-            # Sample from distribution
-            trace = pm.sample(
-                draws=NUM_SAMPLES, 
-                tune=BURN_SAMPLES, 
-                chains=CHAINS, 
-                return_inferencedata=True, 
-                target_accept=TARGET_ACCEPT
-            )
-        # Extract sample
-        minutes_played = trace.posterior["minutes_played"].mean(dim=["chain", "draw"]).values
-        # Append the sampled data
-        sampled_data.append({
-            "name": player_row["name"],
-            "minutes_played": minutes_played
-        })
-    sampled_minutes_played = pd.DataFrame(sampled_data)
-    starting_lineup_with_minutes_played = starting_lineup.merge(right=sampled_minutes_played, how="inner", on="name")
+    with pm.Model():
+        minutes_probs = pm.Dirichlet(
+            "minutes_probs", 
+            a=player_minutes_alphas,
+            shape=(len(player_minutes_alphas), 91)
+        )
+        minutes_played = pm.Categorical(
+            "minutes_played",
+            p=minutes_probs,
+            shape=len(starting_lineup)
+        )
+        # Sample from distribution
+        prior_sample = pm.sample_prior_predictive(samples=NUM_SAMPLES)
+    # Extract sample
+    sampled_minutes_played = prior_sample.prior["minutes_played"].mean(dim=["chain", "draw"]).values.astype(int)
+    # Append the sampled data
+    sampled_data = pd.DataFrame({
+        "name": starting_lineup["name"].values,
+        "minutes_played": sampled_minutes_played
+    })
+    starting_lineup_with_minutes_played = starting_lineup.merge(
+        right=sampled_data, 
+        how="inner", 
+        on="name"
+    )
     return starting_lineup_with_minutes_played
 
 def score_minutes_played(fixture: pd.Series, players_in_field: pd.DataFrame, home_team_benched: pd.DataFrame, away_team_benched:pd.DataFrame) -> pd.DataFrame:
@@ -201,11 +206,12 @@ def simulate_fixture(fixture: pd.Series, players_ability_df: pd.DataFrame, posit
     away_team_players_with_stats = sample_player_stats(
         players_ability_df[players_ability_df["team"] == fixture["home_team"]]
     )
+    
     # Sample starting lineups
     home_team_starting = home_team_players_with_stats.sample(n=STARTING_PLAYERS, weights="start_prob", replace=False)
     away_team_starting = away_team_players_with_stats.sample(n=STARTING_PLAYERS, weights="start_prob", replace=False)
     
-    # Sample minutes played for starting lineup
+    # Sample minutes played for starting lineup players
     home_team_starting = sample_players_minutes_played(home_team_starting, position_minutes)
     away_team_starting = sample_players_minutes_played(away_team_starting, position_minutes)
     
@@ -216,7 +222,11 @@ def simulate_fixture(fixture: pd.Series, players_ability_df: pd.DataFrame, posit
     home_team_score, _ = np.unravel_index(np.tril(match_score_matrix).argmax(), match_score_matrix.shape)
     _, away_team_score = np.unravel_index(np.triu(match_score_matrix).argmax(), match_score_matrix.shape)
    
-    players_in_field = pd.concat([home_team_starting, away_team_starting], axis=0, ignore_index=True).sort_values(by=["minutes_played"], inplace=False, ascending=True)
+    players_in_field = pd.concat(
+        [home_team_starting, away_team_starting], 
+        axis=0, 
+        ignore_index=True
+    ).sort_values(by=["minutes_played"], ascending=True)
 
     # Award points
     players_in_field = score_minutes_played(fixture, players_in_field, home_team_benched, away_team_benched)
@@ -241,9 +251,8 @@ def simulate_gameweek(season_start_year: str, gameweek: str, fixtures_df: pd.Dat
             position_minutes_df (pd.DataFrame): A DataFrame containing position-specific minutes distribution
     """
     # Load data files
-    shortened_season_end_year = str(int(season_start_year) + 1)[2:]
-    year_folder = f"{season_start_year + "-" + shortened_season_end_year}"
-    player_ability_file_path = os.path.join(DATA_FOLDER, year_folder, PLAYER_ABILITY_FILE)
+    season_folder_name = format_season_name(season_start_year)
+    player_ability_file_path = os.path.join(DATA_FOLDER, season_folder_name, PLAYER_ABILITY_FILE)
     players_ability_df = pd.read_csv(filepath_or_buffer=player_ability_file_path)
 
     # Prediction model
@@ -258,6 +267,7 @@ def simulate_gameweek(season_start_year: str, gameweek: str, fixtures_df: pd.Dat
         )
         fixture_points = simulate_fixture(fixture_row, players_ability_df, position_minutes_df, match_score_matrix)
         fixture_points_df.append(fixture_points)
+        break
     # Concatenate all player points into a single DataFrame
     gameweek_player_points_df = pd.concat(fixture_points_df, ignore_index=True)
     

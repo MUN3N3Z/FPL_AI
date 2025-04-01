@@ -133,4 +133,5 @@ class DixonColesModel:
                                                     team_avgs[1], params['rho']) for away_goals in range(2)]
                                     for home_goals in range(2)])
         output_matrix[:2,:2] = output_matrix[:2,:2] * correction_matrix
+        print(DixonColesModel.solve_parameters.cache_info())
         return output_matrix

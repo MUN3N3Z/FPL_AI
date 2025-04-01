@@ -55,9 +55,6 @@ def position_clean_sheet_points_map(position: str) -> int:
     }
     return position_points[position]
 
-def np_array_to_list(np_array: np.array) -> str:
-    return str(np_array.tolist())
-
 def string_list_to_np_array(string_list: str) -> np.array:
     """ Converts a string representation of a list to a numpy array """
     return np.array(ast.literal_eval(string_list))
@@ -66,3 +63,8 @@ def random_bool():
     """ Return a random boolean value """
     random.seed(19)
     return random.choice([True, False])
+
+def format_season_name(season_start_year: str) -> str:
+    """ Create data file name based on the season_start_year """
+    shortened_season_end_year = str(int(season_start_year) + 1)[2:]
+    return f"{season_start_year + "-" + shortened_season_end_year}"

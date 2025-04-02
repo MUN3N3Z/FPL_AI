@@ -1,0 +1,231 @@
+\section{Background: English Premier League and Fantasy Premier League}
+
+\subsection{The English Premier League: Structure and Significance}
+
+The English Premier League (EPL) is the top tier of professional football (soccer) in England, founded in 1992 after breaking away from the Football League \cite{conn2017}. It consists of 20 clubs that compete in a double round-robin tournament, playing 38 matches each season (home and away against every other team). The season typically runs from August to May, with teams awarded three points for a win, one for a draw, and none for a loss. At the end of each season, the three lowest-ranked teams are relegated to the Championship (second tier), while three teams are promoted from the Championship to the Premier League \cite{premierleague2023}.
+
+The EPL has grown to become the most-watched sports league globally, broadcasting to 212 territories with a potential audience of 4.7 billion people \cite{buraimo2015}. Its commercial success is unprecedented, with the 2022-2025 broadcasting rights valued at approximately £10 billion \cite{evens2022}. This financial power has enabled EPL clubs to attract elite players and coaches from around the world, contributing to the league's competitive nature and global appeal \cite{szymanski2005}.
+
+\subsection{Fantasy Premier League: Game Mechanics and Popularity}
+
+Fantasy Premier League (FPL) is the official fantasy sports game associated with the English Premier League. Launched in 2002, it has grown exponentially to over 11 million players worldwide as of the 2023/24 season \cite{fpl2023}. FPL allows participants to assemble a virtual team of real Premier League players within specific constraints and earn points based on those players' actual performances in Premier League matches \cite{bonomo2014}.
+
+\subsubsection{Basic Rules and Structure}
+
+Participants (known as ``managers'') are allocated a virtual budget (£100 million) to select a 15-player squad consisting of:
+\begin{itemize}
+    \item 2 Goalkeepers
+    \item 5 Defenders
+    \item 5 Midfielders
+    \item 3 Forwards
+\end{itemize}
+
+The budget constraint forces managers to balance premium-priced elite players with cheaper options. Each gameweek, managers select 11 players from their 15-player squad to form a starting lineup, with the remaining 4 players on the bench. Additional constraints include:
+\begin{itemize}
+    \item Maximum of 3 players from any single Premier League club
+    \item Formation requirements (minimum of 1 goalkeeper, 3 defenders, and 1 forward)
+    \item Limited free transfers between gameweeks (typically 1 per week, with additional transfers costing points) \cite{fpl2024rules}
+\end{itemize}
+
+\subsubsection{Scoring System}
+
+Points are awarded based on players' real-world performance metrics:
+\begin{itemize}
+    \item Appearance (playing at least 60 minutes): 2 points
+    \item Goals: 6 points (midfielder), 4 points (forward), 6 points (defender/goalkeeper)
+    \item Assists: 3 points
+    \item Clean sheets: 4 points (defender/goalkeeper), 1 point (midfielder)
+    \item Saves: 1 point per 3 saves (goalkeeper)
+    \item Penalties saved: 5 points (goalkeeper)
+    \item Bonus points: 1-3 additional points to the top performers in each match
+\end{itemize}
+
+Negative points are also assigned for:
+\begin{itemize}
+    \item Yellow cards: -1 point
+    \item Red cards: -3 points
+    \item Own goals: -2 points
+    \item Penalties missed: -2 points
+    \item Goals conceded: -1 point per 2 goals (defender/goalkeeper) \cite{fpl2024rules}
+\end{itemize}
+
+\subsubsection{Special Features}
+
+FPL includes several strategic elements that increase its complexity:
+\begin{itemize}
+    \item \textbf{Captain}: Managers designate one player as captain each gameweek, doubling their points
+    \item \textbf{Vice-captain}: A backup who becomes captain if the original captain doesn't play
+    \item \textbf{Chips}: Special boosts used once per season:
+    \begin{itemize}
+        \item Bench Boost: Points from bench players count for one gameweek
+        \item Triple Captain: Triple (rather than double) points for the captain
+        \item Free Hit: Unlimited free transfers for one gameweek only
+        \item Assistant Manager: Add a manager to your team to score points for three consecutive gameweeks
+        \item Wildcard: Unlimited free transfers that permanently change the team \cite{fpl2024rules}
+    \end{itemize}
+\end{itemize}
+
+\subsection{Data and Performance Metrics in Football}
+
+\subsubsection{Traditional Statistics}
+
+Football has historically relied on basic statistics to evaluate performance:
+\begin{itemize}
+    \item Goals and assists
+    \item Clean sheets
+    \item Shots and shots on target
+    \item Pass completion percentage
+    \item Possession percentage
+    \item Cards and fouls \cite{hughes2005}
+\end{itemize}
+
+\subsubsection{Advanced Metrics}
+
+Recent years have seen an explosion in advanced metrics:
+\begin{itemize}
+    \item Expected Goals (xG): Probability of a shot resulting in a goal
+    \item Expected Assists (xA): Probability of a pass leading to a goal
+    \item Progressive Passes/Carries: Passes/carries that move the ball significantly toward the opponent's goal
+    \item Defensive Actions: Tackles, interceptions, clearances, and blocks
+    \item Pressure Events: Instances of applying pressure to an opponent
+    \item VAEP (Value of Actions by Estimating Probabilities): Calculating the value of every action \cite{decroos2019, fernandez2021}
+\end{itemize}
+
+\subsubsection{Player Pricing and Value}
+
+FPL assigns each player a monetary value, which fluctuates throughout the season based on ownership patterns. The game adjusts player prices according to transfer market dynamics:
+\begin{itemize}
+    \item Players transferred in by many managers typically increase in price
+    \item Players transferred out by many managers typically decrease in price
+    \item Price changes occur in £0.1m increments within certain thresholds \cite{tran2022}
+\end{itemize}
+
+This dynamic pricing creates a parallel ``market economy'' that influences decision-making, as managers must consider not only point-scoring potential but also value appreciation/depreciation \cite{constantinou2017}.
+
+\subsection{Decision-Making Challenges in FPL}
+
+\subsubsection{Team Selection Complexity}
+
+The fundamental challenge in FPL is optimizing team selection under constraints. With approximately 500 Premier League players available, the theoretical number of valid 15-player squads exceeds $10^{23}$. Even limiting to weekly starting 11 selections, the decision space remains enormous \cite{matthews2012}.
+
+\subsubsection{Predictive Uncertainty}
+
+Football is inherently unpredictable, with significant variance in player performance. Key uncertainties include:
+\begin{itemize}
+    \item Injuries and rotation (players rested for certain matches)
+    \item Form fluctuations throughout the season
+    \item Managerial decisions affecting player roles and playing time
+    \item Match context and fixture difficulty
+    \item Weather conditions and other external factors \cite{bialkowski2014, bryson2013}
+\end{itemize}
+
+\subsubsection{Multi-objective Optimization}
+
+FPL managers must balance competing objectives:
+\begin{itemize}
+    \item Maximizing expected points for the current gameweek
+    \item Planning for future gameweeks (favorable fixture runs)
+    \item Building team value through strategic transfers
+    \item Differential selection (picking low-ownership players for competitive advantage)
+    \item Risk management (captaincy choices, bench quality) \cite{matthews2013}
+\end{itemize}
+
+\subsubsection{Temporal Dynamics}
+
+The game spans 38 gameweeks, requiring both short and long-term planning:
+\begin{itemize}
+    \item Weekly decisions: Starting lineup, captaincy, transfers
+    \item Medium-term decisions: Chip usage, planning for blank/double gameweeks
+    \item Season-long decisions: Overall strategy and style of play \cite{constantinou2019}
+\end{itemize}
+
+\subsection{Relationship to Reinforcement Learning}
+
+Fantasy Premier League presents an ideal environment for reinforcement learning applications due to several characteristics:
+
+\subsubsection{Markov Decision Process Formulation}
+
+FPL naturally fits into the Markov Decision Process framework:
+\begin{itemize}
+    \item \textbf{States}: Current team composition, budget, available transfers, fixture schedule
+    \item \textbf{Actions}: Transfers, captain selection, bench order, chip usage
+    \item \textbf{Transitions}: How actions transform the state (affected by real-world player performances)
+    \item \textbf{Rewards}: Gameweek points earned
+    \item \textbf{Long-term rewards}: Season-long point accumulation \cite{sutton2018, butler2021}
+\end{itemize}
+
+\subsubsection{Delayed Rewards and Credit Assignment}
+
+FPL exhibits the classic reinforcement learning challenge of delayed rewards:
+\begin{itemize}
+    \item Transfer decisions may not pay off immediately
+    \item Building team value early may enable stronger teams later
+    \item Planning for fixture difficulty must account for weeks or months ahead \cite{silver2017}
+\end{itemize}
+
+\subsubsection{Exploration-Exploitation Tradeoff}
+
+Successful FPL strategy requires balancing:
+\begin{itemize}
+    \item Exploitation: Selecting proven performers and popular captaincy options
+    \item Exploration: Taking calculated risks on differentials or emerging players \cite{matthews2019}
+\end{itemize}
+
+\subsubsection{Non-stationarity}
+
+The FPL environment is non-stationary due to:
+\begin{itemize}
+    \item Player form changes throughout the season
+    \item Team tactical evolutions
+    \item Injury impacts
+    \item Transfer windows (January) bringing new players
+    \item Manager changes affecting team performance \cite{dixon1997}
+\end{itemize}
+
+\subsection{Previous Research and Algorithmic Approaches}
+
+\subsubsection{Optimization-Based Approaches}
+
+Early algorithmic approaches to FPL focused on optimization techniques:
+\begin{itemize}
+    \item Linear programming for team selection
+    \item Integer programming for transfer planning
+    \item Mixed-integer programming for season-long planning
+\end{itemize}
+
+While effective for constrained selection problems, these approaches often struggle with the inherent uncertainty and temporal dynamics of football \cite{pantuso2017, rotshtein2005}.
+
+\subsubsection{Machine Learning Applications}
+
+Recent research has increasingly applied machine learning:
+\begin{itemize}
+    \item Regression models for player point prediction
+    \item Time series forecasting for form prediction
+    \item Classification models for clean sheet probability
+    \item Ensemble methods combining multiple prediction approaches \cite{guo2017, baboota2019}
+\end{itemize}
+
+\subsubsection{Reinforcement Learning Explorations}
+
+Emerging research applies reinforcement learning to FPL:
+\begin{itemize}
+    \item Q-learning for transfer decisions
+    \item Deep Q-Networks for team selection
+    \item Policy gradient methods for season-long strategy
+    \item Monte Carlo Tree Search for planning \cite{hubacek2019, rahimian2021}
+\end{itemize}
+
+These approaches show promise in managing the complex, sequential decision-making process that FPL represents, while accounting for uncertainty and delayed rewards.
+
+\subsection{Data Sources and Availability}
+
+Modern FPL research benefits from unprecedented data availability:
+\begin{itemize}
+    \item Official FPL API providing comprehensive game data
+    \item Third-party websites aggregating historical performance
+    \item Event-level data from commercial providers (Opta, StatsBomb)
+    \item Community resources like public GitHub repositories of historical data
+    \item Web scrapers that collect and organize player statistics \cite{pappalardo2019, decroos2020}
+\end{itemize}
+
+This rich data ecosystem enables the training of sophisticated models that can make informed predictions about player performance and optimal decision strategies.

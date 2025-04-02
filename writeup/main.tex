@@ -1,0 +1,94 @@
+% CPSC 490 Senior Project
+% Senior Thesis Template
+% Department of Computer Science
+% Yale University 
+
+% Contact Sohee Park @ sohee.park@yale.edu with any questions. 
+% Final report should be submitted in PDF format to Canvas and Zoo.  
+% Please see Canvas for details on submission. 
+
+\documentclass[12pt,twoside]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\graphicspath{ {images/} }
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[a4paper,width=150mm,top=35mm,bottom=35mm,bindingoffset=6mm]{geometry}
+
+\usepackage{float}
+\usepackage{url}
+\urlstyle{same}
+\newcommand{\blue}[1]{\textcolor{blue}{{ *sk: #1}}}
+% \usepackage[square,sort,comma,numbers]{natbib}
+\usepackage[%
+colorlinks,bookmarksopen,bookmarksnumbered,citecolor=black,urlcolor=black
+]{hyperref}
+
+\usepackage{titlesec} % Add this line
+\usepackage{booktabs}
+
+% Customize chapter title format
+\titleformat{\chapter}[hang] 
+  {\normalfont\huge\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{35pt}{20pt}
+
+\bibliographystyle{plainnat}
+\usepackage[sorting=none]{biblatex}
+\addbibresource{references.bib}
+\hypersetup{linkcolor=black}
+\begin{document}
+
+\input{titlepage}
+
+\chapter*{Acknowledgements}
+I want to acknowledge Professor James Glenn for his support and guidance through this ambitious project. Special thanks to the Yale Department of Computer Science and the Yale Department of Economics for pushing me beyond what I thought were my academic limits.
+I'm truly grateful for the immense resources and opportunities that have enriched my time at Yale.
+
+Lastly, but not least, I would like to acknowledge myself. For the unending grit to perservere 3 am sessions debugging C program seg faults and memory leaks. For learning how to code from \href{https://scratch.mit.edu/}{Sratch} (literally). For completing this passion project.
+And for everything in between.
+{
+  \hypersetup{linkcolor=black}
+  \tableofcontents
+}
+
+\clearpage
+
+\input{abstract}
+% \listoffigures
+
+% \listoftables
+
+\chapter{Introduction}
+\input{introduction}
+
+\chapter{Background} \label{ch:background}
+\input{background}
+
+\chapter{Methodology} \label{ch:methodology}
+\input{methodology}
+
+
+\chapter{Results} \label{ch:results}
+\input{results}
+
+\chapter{Related Work} \label{ch:relatedwork}
+\input{relatedwork}
+
+\chapter{Conclusions} \label{ch:conclusion}
+\input{conclusion}
+
+\chapter{Future Work} \label{ch:futurework}
+\input{futurework}
+
+
+\printbibliography
+
+\appendix
+\chapter{Appendix Title} \label{ch:appendices}
+\input{appendices} 
+
+\end{document}
+

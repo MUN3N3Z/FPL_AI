@@ -1,0 +1,1175 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{conn2017}{book}{}
+      \name{author}{1}{}{%
+        {{hash=38ae4d396fa75119f5328db9dcc40c1d}{%
+           family={Conn},
+           familyi={C\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Random House}%
+      }
+      \strng{namehash}{38ae4d396fa75119f5328db9dcc40c1d}
+      \strng{fullhash}{38ae4d396fa75119f5328db9dcc40c1d}
+      \strng{bibnamehash}{38ae4d396fa75119f5328db9dcc40c1d}
+      \strng{authorbibnamehash}{38ae4d396fa75119f5328db9dcc40c1d}
+      \strng{authornamehash}{38ae4d396fa75119f5328db9dcc40c1d}
+      \strng{authorfullhash}{38ae4d396fa75119f5328db9dcc40c1d}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{The Fall of the House of FIFA}
+      \field{year}{2017}
+    \endentry
+    \entry{premierleague2023}{report}{}
+      \name{author}{1}{}{%
+        {{hash=225602381bd61b1619ef2e61888dcbae}{%
+           family={{Premier League}},
+           familyi={P\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Premier League}%
+      }
+      \strng{namehash}{225602381bd61b1619ef2e61888dcbae}
+      \strng{fullhash}{225602381bd61b1619ef2e61888dcbae}
+      \strng{bibnamehash}{225602381bd61b1619ef2e61888dcbae}
+      \strng{authorbibnamehash}{225602381bd61b1619ef2e61888dcbae}
+      \strng{authornamehash}{225602381bd61b1619ef2e61888dcbae}
+      \strng{authorfullhash}{225602381bd61b1619ef2e61888dcbae}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Premier League Handbook 2023/24}
+      \field{type}{techreport}
+      \field{year}{2023}
+    \endentry
+    \entry{buraimo2015}{article}{}
+      \name{author}{2}{}{%
+        {{hash=7be34def0c539f9fb71d5948676979ab}{%
+           family={Buraimo},
+           familyi={B\bibinitperiod},
+           given={Babatunde},
+           giveni={B\bibinitperiod}}}%
+        {{hash=77639f27b2142a0308300e1d343898fb}{%
+           family={Simmons},
+           familyi={S\bibinitperiod},
+           given={Rob},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{652d78d02e7b06cac97e5434f9d44406}
+      \strng{fullhash}{652d78d02e7b06cac97e5434f9d44406}
+      \strng{bibnamehash}{652d78d02e7b06cac97e5434f9d44406}
+      \strng{authorbibnamehash}{652d78d02e7b06cac97e5434f9d44406}
+      \strng{authornamehash}{652d78d02e7b06cac97e5434f9d44406}
+      \strng{authorfullhash}{652d78d02e7b06cac97e5434f9d44406}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of the Economics of Business}
+      \field{number}{3}
+      \field{title}{Uncertainty of outcome or star quality? Television audience demand for {English Premier League} football}
+      \field{volume}{22}
+      \field{year}{2015}
+      \field{pages}{449\bibrangedash 469}
+      \range{pages}{21}
+    \endentry
+    \entry{evens2022}{article}{}
+      \name{author}{3}{}{%
+        {{hash=7105c2121896d02a4f5c4b715abaabc1}{%
+           family={Evens},
+           familyi={E\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=785e97ec38e10e096516e5db0201b227}{%
+           family={Iosifidis},
+           familyi={I\bibinitperiod},
+           given={Petros},
+           giveni={P\bibinitperiod}}}%
+        {{hash=b44eba830fe9817fbe8e53c82f1cbe04}{%
+           family={Smith},
+           familyi={S\bibinitperiod},
+           given={Paul},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
+      \strng{fullhash}{958b8d76e5f1dc076ea6a0b6cbb64613}
+      \strng{bibnamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
+      \strng{authorbibnamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
+      \strng{authornamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
+      \strng{authorfullhash}{958b8d76e5f1dc076ea6a0b6cbb64613}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Sport Policy and Politics}
+      \field{number}{1}
+      \field{title}{The political economy of television sports rights: History, power and culture}
+      \field{volume}{14}
+      \field{year}{2022}
+      \field{pages}{13\bibrangedash 30}
+      \range{pages}{18}
+    \endentry
+    \entry{szymanski2005}{book}{}
+      \name{author}{2}{}{%
+        {{hash=c351519d88e719424aaa547442e03956}{%
+           family={Szymanski},
+           familyi={S\bibinitperiod},
+           given={Stefan},
+           giveni={S\bibinitperiod}}}%
+        {{hash=6fde3d4e18f644dec3cc4eebc26c83dd}{%
+           family={Zimbalist},
+           familyi={Z\bibinitperiod},
+           given={Andrew},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Brookings Institution Press}%
+      }
+      \strng{namehash}{629b189f4b8eded96da0575b5bdbf6af}
+      \strng{fullhash}{629b189f4b8eded96da0575b5bdbf6af}
+      \strng{bibnamehash}{629b189f4b8eded96da0575b5bdbf6af}
+      \strng{authorbibnamehash}{629b189f4b8eded96da0575b5bdbf6af}
+      \strng{authornamehash}{629b189f4b8eded96da0575b5bdbf6af}
+      \strng{authorfullhash}{629b189f4b8eded96da0575b5bdbf6af}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{National Pastime: How Americans Play Baseball and the Rest of the World Plays Soccer}
+      \field{year}{2005}
+    \endentry
+    \entry{fpl2023}{report}{}
+      \name{author}{1}{}{%
+        {{hash=6b2757d2c251fac9f9c08989e869930e}{%
+           family={{Fantasy Premier League}},
+           familyi={F\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Premier League}%
+      }
+      \strng{namehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{fullhash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{bibnamehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{authorbibnamehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{authornamehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{authorfullhash}{6b2757d2c251fac9f9c08989e869930e}
+      \field{extraname}{1}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Official Fantasy Premier League Participation Statistics}
+      \field{type}{techreport}
+      \field{year}{2023}
+    \endentry
+    \entry{bonomo2014}{article}{}
+      \name{author}{3}{}{%
+        {{hash=1d368454351b4b4ce955f5fe023805ea}{%
+           family={Bonomo},
+           familyi={B\bibinitperiod},
+           given={Flavia},
+           giveni={F\bibinitperiod}}}%
+        {{hash=8b9fe9265219129d4bdf75053e65598d}{%
+           family={Durán},
+           familyi={D\bibinitperiod},
+           given={Guillermo},
+           giveni={G\bibinitperiod}}}%
+        {{hash=e40b543636c008a266652ac3cf79ce31}{%
+           family={Marenco},
+           familyi={M\bibinitperiod},
+           given={Javier},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
+      \strng{fullhash}{c1797b1115ad0e1b6640bfb3efe74cfe}
+      \strng{bibnamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
+      \strng{authorbibnamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
+      \strng{authornamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
+      \strng{authorfullhash}{c1797b1115ad0e1b6640bfb3efe74cfe}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Transactions in Operational Research}
+      \field{number}{3}
+      \field{title}{Mathematical programming as a tool for virtual soccer coaches: {A} case study of a fantasy sport game}
+      \field{volume}{21}
+      \field{year}{2014}
+      \field{pages}{399\bibrangedash 414}
+      \range{pages}{16}
+    \endentry
+    \entry{fpl2024rules}{online}{}
+      \name{author}{1}{}{%
+        {{hash=6b2757d2c251fac9f9c08989e869930e}{%
+           family={{Fantasy Premier League}},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{fullhash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{bibnamehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{authorbibnamehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{authornamehash}{6b2757d2c251fac9f9c08989e869930e}
+      \strng{authorfullhash}{6b2757d2c251fac9f9c08989e869930e}
+      \field{extraname}{2}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Rules}
+      \field{urlday}{1}
+      \field{urlmonth}{4}
+      \field{urlyear}{2024}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://fantasy.premierleague.com/help/rules
+      \endverb
+      \verb{url}
+      \verb https://fantasy.premierleague.com/help/rules
+      \endverb
+    \endentry
+    \entry{hughes2005}{book}{}
+      \name{author}{2}{}{%
+        {{hash=ae0402fe0fcd708fc0f9d3436fbfa2ce}{%
+           family={Hughes},
+           familyi={H\bibinitperiod},
+           given={Mike},
+           giveni={M\bibinitperiod}}}%
+        {{hash=3c1a0f3396ec5856dff89e1e2918ace9}{%
+           family={Franks},
+           familyi={F\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Routledge}%
+      }
+      \strng{namehash}{0ea6770f1b57354ea57dd9dd1caefd07}
+      \strng{fullhash}{0ea6770f1b57354ea57dd9dd1caefd07}
+      \strng{bibnamehash}{0ea6770f1b57354ea57dd9dd1caefd07}
+      \strng{authorbibnamehash}{0ea6770f1b57354ea57dd9dd1caefd07}
+      \strng{authornamehash}{0ea6770f1b57354ea57dd9dd1caefd07}
+      \strng{authorfullhash}{0ea6770f1b57354ea57dd9dd1caefd07}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Analysis of Sport: The Key Concepts}
+      \field{year}{2005}
+    \endentry
+    \entry{decroos2019}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=699484d3f867b6b54ba22b93823469f0}{%
+           family={Decroos},
+           familyi={D\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=d6a6a5ef42d5e32b778e62b74c2bde17}{%
+           family={Bransen},
+           familyi={B\bibinitperiod},
+           given={Lotte},
+           giveni={L\bibinitperiod}}}%
+        {{hash=628282ac08443caa0c670d1185315de2}{%
+           family={Van\bibnamedelima Haaren},
+           familyi={V\bibinitperiod\bibinitdelim H\bibinitperiod},
+           given={Jan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=5f9ed160b91c65c59a8d61af7f1e5017}{%
+           family={Davis},
+           familyi={D\bibinitperiod},
+           given={Jesse},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{0aefe97c22682eb9266d64d68c3a6d39}
+      \strng{fullhash}{4846cbbf45b483c3332ce64a6acca288}
+      \strng{bibnamehash}{0aefe97c22682eb9266d64d68c3a6d39}
+      \strng{authorbibnamehash}{0aefe97c22682eb9266d64d68c3a6d39}
+      \strng{authornamehash}{0aefe97c22682eb9266d64d68c3a6d39}
+      \strng{authorfullhash}{4846cbbf45b483c3332ce64a6acca288}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery \& Data Mining}
+      \field{month}{7}
+      \field{title}{Actions speak louder than goals: {Valuing} player actions in soccer}
+      \field{year}{2019}
+      \field{pages}{1851\bibrangedash 1861}
+      \range{pages}{11}
+    \endentry
+    \entry{fernandez2021}{article}{}
+      \name{author}{3}{}{%
+        {{hash=a99393f4e35b534afcbcdb6388bd346c}{%
+           family={Fernández},
+           familyi={F\bibinitperiod},
+           given={Javier},
+           giveni={J\bibinitperiod}}}%
+        {{hash=13b72840399139f675732db9116a9763}{%
+           family={Bornn},
+           familyi={B\bibinitperiod},
+           given={Luke},
+           giveni={L\bibinitperiod}}}%
+        {{hash=32d8af76f6f2815ae2911f65d922fa65}{%
+           family={Cervone},
+           familyi={C\bibinitperiod},
+           given={Dan},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{4756ddfa36c0bf692a1927be0a3e6902}
+      \strng{fullhash}{4756ddfa36c0bf692a1927be0a3e6902}
+      \strng{bibnamehash}{4756ddfa36c0bf692a1927be0a3e6902}
+      \strng{authorbibnamehash}{4756ddfa36c0bf692a1927be0a3e6902}
+      \strng{authornamehash}{4756ddfa36c0bf692a1927be0a3e6902}
+      \strng{authorfullhash}{4756ddfa36c0bf692a1927be0a3e6902}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Machine Learning}
+      \field{number}{6}
+      \field{title}{A framework for the fine-grained evaluation of the instantaneous expected value of soccer possessions}
+      \field{volume}{110}
+      \field{year}{2021}
+      \field{pages}{1389\bibrangedash 1427}
+      \range{pages}{39}
+    \endentry
+    \entry{tran2022}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=fc9393c9704a8ec8f7c9a0100c086d74}{%
+           family={Tran},
+           familyi={T\bibinitperiod},
+           given={Quyen},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=18436e634fdd974c3369599c42fe8e31}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Seongsoo},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{4a92b92741c21112346f268a3b9d858f}
+      \strng{fullhash}{4a92b92741c21112346f268a3b9d858f}
+      \strng{bibnamehash}{4a92b92741c21112346f268a3b9d858f}
+      \strng{authorbibnamehash}{4a92b92741c21112346f268a3b9d858f}
+      \strng{authornamehash}{4a92b92741c21112346f268a3b9d858f}
+      \strng{authorfullhash}{4a92b92741c21112346f268a3b9d858f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2022 International Conference on Information Networking (ICOIN)}
+      \field{title}{Predicting fantasy premier league price changes using machine learning}
+      \field{year}{2022}
+      \field{pages}{622\bibrangedash 627}
+      \range{pages}{6}
+    \endentry
+    \entry{constantinou2017}{article}{}
+      \name{author}{2}{}{%
+        {{hash=0919c3bf63ce908310fafd87bb3f100e}{%
+           family={Constantinou},
+           familyi={C\bibinitperiod},
+           given={Anthony\bibnamedelima C.},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=541a13fe01a828f02c173411fb53d26d}{%
+           family={Fenton},
+           familyi={F\bibinitperiod},
+           given={Norman\bibnamedelima E.},
+           giveni={N\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \strng{namehash}{e680a7b4273436cb8a7debb738934a45}
+      \strng{fullhash}{e680a7b4273436cb8a7debb738934a45}
+      \strng{bibnamehash}{e680a7b4273436cb8a7debb738934a45}
+      \strng{authorbibnamehash}{e680a7b4273436cb8a7debb738934a45}
+      \strng{authornamehash}{e680a7b4273436cb8a7debb738934a45}
+      \strng{authorfullhash}{e680a7b4273436cb8a7debb738934a45}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Knowledge-Based Systems}
+      \field{title}{Towards smart-data: {Improving} predictive accuracy in long-term football team performance}
+      \field{volume}{124}
+      \field{year}{2017}
+      \field{pages}{93\bibrangedash 104}
+      \range{pages}{12}
+    \endentry
+    \entry{matthews2012}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=67a9fc98f02000f40afc4f01377ef721}{%
+           family={Matthews},
+           familyi={M\bibinitperiod},
+           given={Terence},
+           giveni={T\bibinitperiod}}}%
+        {{hash=e2171c981b05f25b3032b46695bb7602}{%
+           family={Ramchurn},
+           familyi={R\bibinitperiod},
+           given={Sarvapali\bibnamedelima D.},
+           giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=332fe145baa95f3abbfec32ceee09a4c}{%
+           family={Chalkiadakis},
+           familyi={C\bibinitperiod},
+           given={Georgios},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{fullhash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{bibnamehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{authorbibnamehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{authornamehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{authorfullhash}{2a0db63b0382f23be15d92fce05daf83}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the AAAI Conference on Artificial Intelligence}
+      \field{month}{6}
+      \field{number}{1}
+      \field{title}{Competing with humans at fantasy football: {Team} formation in large partially-observable domains}
+      \field{volume}{26}
+      \field{year}{2012}
+    \endentry
+    \entry{bialkowski2014}{inproceedings}{}
+      \name{author}{6}{}{%
+        {{hash=f6dac99ead86f6e198b80b80054ec37e}{%
+           family={Bialkowski},
+           familyi={B\bibinitperiod},
+           given={Alina},
+           giveni={A\bibinitperiod}}}%
+        {{hash=7ec74a05c0565b3f616f47382c901164}{%
+           family={Lucey},
+           familyi={L\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=8f942ac1911200f60a35f4a6a69cf793}{%
+           family={Carr},
+           familyi={C\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=d433272a8da287e7d9b17c3f80798a3f}{%
+           family={Yue},
+           familyi={Y\bibinitperiod},
+           given={Yisong},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=c1bc00367e79852538e7aee394d64860}{%
+           family={Sridharan},
+           familyi={S\bibinitperiod},
+           given={Sridha},
+           giveni={S\bibinitperiod}}}%
+        {{hash=de7691b01181d3d91375d999b474c55f}{%
+           family={Matthews},
+           familyi={M\bibinitperiod},
+           given={Iain},
+           giveni={I\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{3b7f210f033a77b8fa310937f63c5c4c}
+      \strng{fullhash}{f1d6643c766a105dbb490f98c7ec87c2}
+      \strng{bibnamehash}{3b7f210f033a77b8fa310937f63c5c4c}
+      \strng{authorbibnamehash}{3b7f210f033a77b8fa310937f63c5c4c}
+      \strng{authornamehash}{3b7f210f033a77b8fa310937f63c5c4c}
+      \strng{authorfullhash}{f1d6643c766a105dbb490f98c7ec87c2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2014 IEEE International Conference on Data Mining}
+      \field{month}{11}
+      \field{title}{Large-scale analysis of soccer matches using spatiotemporal tracking data}
+      \field{year}{2014}
+      \field{pages}{725\bibrangedash 730}
+      \range{pages}{6}
+    \endentry
+    \entry{bryson2013}{article}{}
+      \name{author}{3}{}{%
+        {{hash=e733f46f35cbaadb78e5f2de7efd2c4d}{%
+           family={Bryson},
+           familyi={B\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+        {{hash=20949d2cdf2c0ee17d592271aaa4cfa6}{%
+           family={Frick},
+           familyi={F\bibinitperiod},
+           given={Bernd},
+           giveni={B\bibinitperiod}}}%
+        {{hash=77639f27b2142a0308300e1d343898fb}{%
+           family={Simmons},
+           familyi={S\bibinitperiod},
+           given={Rob},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{50a4b3c316491528df779c66d9e51c08}
+      \strng{fullhash}{50a4b3c316491528df779c66d9e51c08}
+      \strng{bibnamehash}{50a4b3c316491528df779c66d9e51c08}
+      \strng{authorbibnamehash}{50a4b3c316491528df779c66d9e51c08}
+      \strng{authornamehash}{50a4b3c316491528df779c66d9e51c08}
+      \strng{authorfullhash}{50a4b3c316491528df779c66d9e51c08}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Sports Economics}
+      \field{number}{6}
+      \field{title}{The returns to scarce talent: {Footedness} and player remuneration in {European} soccer}
+      \field{volume}{14}
+      \field{year}{2013}
+      \field{pages}{606\bibrangedash 628}
+      \range{pages}{23}
+    \endentry
+    \entry{matthews2013}{article}{}
+      \name{author}{1}{}{%
+        {{hash=67a9fc98f02000f40afc4f01377ef721}{%
+           family={Matthews},
+           familyi={M\bibinitperiod},
+           given={Terence},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{67a9fc98f02000f40afc4f01377ef721}
+      \strng{fullhash}{67a9fc98f02000f40afc4f01377ef721}
+      \strng{bibnamehash}{67a9fc98f02000f40afc4f01377ef721}
+      \strng{authorbibnamehash}{67a9fc98f02000f40afc4f01377ef721}
+      \strng{authornamehash}{67a9fc98f02000f40afc4f01377ef721}
+      \strng{authorfullhash}{67a9fc98f02000f40afc4f01377ef721}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Quantitative Analysis in Sports}
+      \field{number}{2}
+      \field{title}{Improving fantasy football draft strategies using multiobjective optimization techniques}
+      \field{volume}{9}
+      \field{year}{2013}
+      \field{pages}{121\bibrangedash 140}
+      \range{pages}{20}
+    \endentry
+    \entry{constantinou2019}{article}{}
+      \name{author}{1}{}{%
+        {{hash=0919c3bf63ce908310fafd87bb3f100e}{%
+           family={Constantinou},
+           familyi={C\bibinitperiod},
+           given={Anthony\bibnamedelima C.},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \strng{namehash}{0919c3bf63ce908310fafd87bb3f100e}
+      \strng{fullhash}{0919c3bf63ce908310fafd87bb3f100e}
+      \strng{bibnamehash}{0919c3bf63ce908310fafd87bb3f100e}
+      \strng{authorbibnamehash}{0919c3bf63ce908310fafd87bb3f100e}
+      \strng{authornamehash}{0919c3bf63ce908310fafd87bb3f100e}
+      \strng{authorfullhash}{0919c3bf63ce908310fafd87bb3f100e}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Machine Learning}
+      \field{number}{1}
+      \field{title}{Dolores: {A} model that predicts football match outcomes from all over the world}
+      \field{volume}{108}
+      \field{year}{2019}
+      \field{pages}{49\bibrangedash 75}
+      \range{pages}{27}
+    \endentry
+    \entry{sutton2018}{book}{}
+      \name{author}{2}{}{%
+        {{hash=eb920e5277d3d5fd0903f3cd41e11871}{%
+           family={Sutton},
+           familyi={S\bibinitperiod},
+           given={Richard\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=32a0a208f8bcf56a13b0a8e618aa806a}{%
+           family={Barto},
+           familyi={B\bibinitperiod},
+           given={Andrew\bibnamedelima G.},
+           giveni={A\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {MIT Press}%
+      }
+      \strng{namehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{fullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{bibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authorbibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authornamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authorfullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{2}
+      \field{title}{Reinforcement Learning: An Introduction}
+      \field{year}{2018}
+    \endentry
+    \entry{butler2021}{article}{}
+      \name{author}{3}{}{%
+        {{hash=465651ef65634a789ae1b955bb34a7af}{%
+           family={Butler},
+           familyi={B\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=96dde354abd21979e6c10432397d82cb}{%
+           family={Butler},
+           familyi={B\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod}}}%
+        {{hash=609b0ecc93b87f3461030db8a517d177}{%
+           family={Eakins},
+           familyi={E\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{c64d68b3cc5a4a0ae2743d0031e238e9}
+      \strng{fullhash}{c64d68b3cc5a4a0ae2743d0031e238e9}
+      \strng{bibnamehash}{c64d68b3cc5a4a0ae2743d0031e238e9}
+      \strng{authorbibnamehash}{c64d68b3cc5a4a0ae2743d0031e238e9}
+      \strng{authornamehash}{c64d68b3cc5a4a0ae2743d0031e238e9}
+      \strng{authorfullhash}{c64d68b3cc5a4a0ae2743d0031e238e9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Financial Studies}
+      \field{number}{1}
+      \field{title}{Expert performance and crowd wisdom: {Evidence} from fantasy premier league}
+      \field{volume}{9}
+      \field{year}{2021}
+      \field{pages}{5}
+      \range{pages}{1}
+    \endentry
+    \entry{silver2017}{article}{}
+      \name{author}{17}{}{%
+        {{hash=89dbd30410c2085cd059f32c57d4593e}{%
+           family={Silver},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=8fad8df927bc0014c0bd6a9feb7aa71d}{%
+           family={Schrittwieser},
+           familyi={S\bibinitperiod},
+           given={Julian},
+           giveni={J\bibinitperiod}}}%
+        {{hash=9d16b7284df92c9adaee86c37ab992df}{%
+           family={Simonyan},
+           familyi={S\bibinitperiod},
+           given={Karen},
+           giveni={K\bibinitperiod}}}%
+        {{hash=af540e84ef1ecdaa70b1f7c90f59fd7d}{%
+           family={Antonoglou},
+           familyi={A\bibinitperiod},
+           given={Ioannis},
+           giveni={I\bibinitperiod}}}%
+        {{hash=ba4b200ce1412a2570cb113366cc9559}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Aja},
+           giveni={A\bibinitperiod}}}%
+        {{hash=4131bd14e5ca890278ecd351e356dc34}{%
+           family={Guez},
+           familyi={G\bibinitperiod},
+           given={Arthur},
+           giveni={A\bibinitperiod}}}%
+        {{hash=80c63e95a9e243591a33a7e3156f1d78}{%
+           family={Hubert},
+           familyi={H\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=fe79638c2bf15e9cd4021e09ca0fa07b}{%
+           family={Baker},
+           familyi={B\bibinitperiod},
+           given={Lucas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=f311ac3fec4a3d3207fdec17a9887704}{%
+           family={Lai},
+           familyi={L\bibinitperiod},
+           given={Matthew},
+           giveni={M\bibinitperiod}}}%
+        {{hash=fa98d81082da72fd49892566108f9cbe}{%
+           family={Bolton},
+           familyi={B\bibinitperiod},
+           given={Adrian},
+           giveni={A\bibinitperiod}}}%
+        {{hash=5759ff4990bdd8c6f85835738834874a}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Yutian},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=3a6fdf4df9a25f1d2d506ad9e86e1f6c}{%
+           family={Lillicrap},
+           familyi={L\bibinitperiod},
+           given={Timothy},
+           giveni={T\bibinitperiod}}}%
+        {{hash=59f6c5b7be30cd01647770d56f297a69}{%
+           family={Hui},
+           familyi={H\bibinitperiod},
+           given={Fan},
+           giveni={F\bibinitperiod}}}%
+        {{hash=50d24de916599d306c5cb1a77156e4b9}{%
+           family={Sifre},
+           familyi={S\bibinitperiod},
+           given={Laurent},
+           giveni={L\bibinitperiod}}}%
+        {{hash=54c5c572d4fdc5d822c240b59fcadad4}{%
+           family={Driessche},
+           familyi={D\bibinitperiod},
+           given={George},
+           giveni={G\bibinitperiod},
+           prefix={van\bibnamedelima den},
+           prefixi={v\bibinitperiod\bibinitdelim d\bibinitperiod}}}%
+        {{hash=368b9b2de627b852658c433b062d4e1e}{%
+           family={Graepel},
+           familyi={G\bibinitperiod},
+           given={Thore},
+           giveni={T\bibinitperiod}}}%
+        {{hash=b160026950ebb1e2286dfb40c15482f5}{%
+           family={Hassabis},
+           familyi={H\bibinitperiod},
+           given={Demis},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{fullhash}{34faf92840e9c6b68a2c64d4df1b42c3}
+      \strng{bibnamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authorbibnamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authornamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authorfullhash}{34faf92840e9c6b68a2c64d4df1b42c3}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nature}
+      \field{number}{7676}
+      \field{title}{Mastering the game of go without human knowledge}
+      \field{volume}{550}
+      \field{year}{2017}
+      \field{pages}{354\bibrangedash 359}
+      \range{pages}{6}
+    \endentry
+    \entry{matthews2019}{article}{}
+      \name{author}{2}{}{%
+        {{hash=67a9fc98f02000f40afc4f01377ef721}{%
+           family={Matthews},
+           familyi={M\bibinitperiod},
+           given={Terence},
+           giveni={T\bibinitperiod}}}%
+        {{hash=e2171c981b05f25b3032b46695bb7602}{%
+           family={Ramchurn},
+           familyi={R\bibinitperiod},
+           given={Sarvapali\bibnamedelima D.},
+           giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+      }
+      \strng{namehash}{2f499801c437720f32956439e2e3192b}
+      \strng{fullhash}{2f499801c437720f32956439e2e3192b}
+      \strng{bibnamehash}{2f499801c437720f32956439e2e3192b}
+      \strng{authorbibnamehash}{2f499801c437720f32956439e2e3192b}
+      \strng{authornamehash}{2f499801c437720f32956439e2e3192b}
+      \strng{authorfullhash}{2f499801c437720f32956439e2e3192b}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Autonomous Agents and Multi-Agent Systems}
+      \field{number}{2}
+      \field{title}{Competing with humans at fantasy football: {Team} formation in large partially-observable domains}
+      \field{volume}{33}
+      \field{year}{2019}
+      \field{pages}{130\bibrangedash 171}
+      \range{pages}{42}
+    \endentry
+    \entry{dixon1997}{article}{}
+      \name{author}{2}{}{%
+        {{hash=1164c3d54b66774d19dad91efbbbb33e}{%
+           family={Dixon},
+           familyi={D\bibinitperiod},
+           given={Mark\bibnamedelima J.},
+           giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=6c4a838648e29ebf56362b5bd4a96164}{%
+           family={Coles},
+           familyi={C\bibinitperiod},
+           given={Stuart\bibnamedelima G.},
+           giveni={S\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+      }
+      \strng{namehash}{f83cbabba2d2598e91eeb2fbff083b72}
+      \strng{fullhash}{f83cbabba2d2598e91eeb2fbff083b72}
+      \strng{bibnamehash}{f83cbabba2d2598e91eeb2fbff083b72}
+      \strng{authorbibnamehash}{f83cbabba2d2598e91eeb2fbff083b72}
+      \strng{authornamehash}{f83cbabba2d2598e91eeb2fbff083b72}
+      \strng{authorfullhash}{f83cbabba2d2598e91eeb2fbff083b72}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the Royal Statistical Society: Series C (Applied Statistics)}
+      \field{number}{2}
+      \field{title}{Modelling association football scores and inefficiencies in the football betting market}
+      \field{volume}{46}
+      \field{year}{1997}
+      \field{pages}{265\bibrangedash 280}
+      \range{pages}{16}
+    \endentry
+    \entry{pantuso2017}{article}{}
+      \name{author}{1}{}{%
+        {{hash=b72930cae25a2e9d5554c8402fdd1cb0}{%
+           family={Pantuso},
+           familyi={P\bibinitperiod},
+           given={Giovanni},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{b72930cae25a2e9d5554c8402fdd1cb0}
+      \strng{fullhash}{b72930cae25a2e9d5554c8402fdd1cb0}
+      \strng{bibnamehash}{b72930cae25a2e9d5554c8402fdd1cb0}
+      \strng{authorbibnamehash}{b72930cae25a2e9d5554c8402fdd1cb0}
+      \strng{authornamehash}{b72930cae25a2e9d5554c8402fdd1cb0}
+      \strng{authorfullhash}{b72930cae25a2e9d5554c8402fdd1cb0}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Quantitative Analysis in Sports}
+      \field{number}{3}
+      \field{title}{The football team composition problem: {A} stochastic programming approach}
+      \field{volume}{13}
+      \field{year}{2017}
+      \field{pages}{113\bibrangedash 129}
+      \range{pages}{17}
+    \endentry
+    \entry{rotshtein2005}{article}{}
+      \name{author}{3}{}{%
+        {{hash=e943756af91b829190bc78acfb84151d}{%
+           family={Rotshtein},
+           familyi={R\bibinitperiod},
+           given={Alexander\bibnamedelima P.},
+           giveni={A\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=f76b02afac3857341b6d64e6c3cbc9e2}{%
+           family={Posner},
+           familyi={P\bibinitperiod},
+           given={Morton},
+           giveni={M\bibinitperiod}}}%
+        {{hash=92302ba9defb56db520c6df6fa75189c}{%
+           family={Rakityanskaya},
+           familyi={R\bibinitperiod},
+           given={Anna\bibnamedelima B.},
+           giveni={A\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+      }
+      \strng{namehash}{b06aee07c230acf499993de2f9ddc47a}
+      \strng{fullhash}{b06aee07c230acf499993de2f9ddc47a}
+      \strng{bibnamehash}{b06aee07c230acf499993de2f9ddc47a}
+      \strng{authorbibnamehash}{b06aee07c230acf499993de2f9ddc47a}
+      \strng{authornamehash}{b06aee07c230acf499993de2f9ddc47a}
+      \strng{authorfullhash}{b06aee07c230acf499993de2f9ddc47a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Cybernetics and Systems Analysis}
+      \field{number}{4}
+      \field{title}{Football predictions based on a fuzzy model with genetic and neural tuning}
+      \field{volume}{41}
+      \field{year}{2005}
+      \field{pages}{619\bibrangedash 630}
+      \range{pages}{12}
+    \endentry
+    \entry{guo2017}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=e053cf028522c39af65dd862da2d8ed1}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Chuan},
+           giveni={C\bibinitperiod}}}%
+        {{hash=373d04718ec0efd3786a0e2b6c0adf00}{%
+           family={Pleiss},
+           familyi={P\bibinitperiod},
+           given={Geoff},
+           giveni={G\bibinitperiod}}}%
+        {{hash=17b6a43f5598c7efd897f9d254090fdd}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Yu},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=68a0238356fbd88b34be8886f25938a7}{%
+           family={Weinberger},
+           familyi={W\bibinitperiod},
+           given={Kilian\bibnamedelima Q.},
+           giveni={K\bibinitperiod\bibinitdelim Q\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {PMLR}%
+      }
+      \strng{namehash}{203b115999f73097be6ab32411fb1f42}
+      \strng{fullhash}{f3833eed8ef776fc6c89f407c7d66c34}
+      \strng{bibnamehash}{203b115999f73097be6ab32411fb1f42}
+      \strng{authorbibnamehash}{203b115999f73097be6ab32411fb1f42}
+      \strng{authornamehash}{203b115999f73097be6ab32411fb1f42}
+      \strng{authorfullhash}{f3833eed8ef776fc6c89f407c7d66c34}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Machine Learning}
+      \field{month}{7}
+      \field{title}{On calibration of modern neural networks}
+      \field{year}{2017}
+      \field{pages}{1321\bibrangedash 1330}
+      \range{pages}{10}
+    \endentry
+    \entry{baboota2019}{article}{}
+      \name{author}{2}{}{%
+        {{hash=324f4c0c2af3a218638f999efd45db33}{%
+           family={Baboota},
+           familyi={B\bibinitperiod},
+           given={Rahul},
+           giveni={R\bibinitperiod}}}%
+        {{hash=d16f886d6a7b11279644c68b22ef763c}{%
+           family={Kaur},
+           familyi={K\bibinitperiod},
+           given={Harleen},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{00d6efc5c6e092b4cbc2e8050ae80984}
+      \strng{fullhash}{00d6efc5c6e092b4cbc2e8050ae80984}
+      \strng{bibnamehash}{00d6efc5c6e092b4cbc2e8050ae80984}
+      \strng{authorbibnamehash}{00d6efc5c6e092b4cbc2e8050ae80984}
+      \strng{authornamehash}{00d6efc5c6e092b4cbc2e8050ae80984}
+      \strng{authorfullhash}{00d6efc5c6e092b4cbc2e8050ae80984}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Forecasting}
+      \field{number}{2}
+      \field{title}{Predictive analysis and modelling football results using machine learning approach for {English Premier League}}
+      \field{volume}{35}
+      \field{year}{2019}
+      \field{pages}{741\bibrangedash 755}
+      \range{pages}{15}
+    \endentry
+    \entry{hubacek2019}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=ba9761d19233b288c2570b2c400a7921}{%
+           family={Hubáček},
+           familyi={H\bibinitperiod},
+           given={Ondřej},
+           giveni={O\bibinitperiod}}}%
+        {{hash=02d7b6b703c5c4c900ea226ff1ab124c}{%
+           family={Šourek},
+           familyi={Š\bibinitperiod},
+           given={Gustav},
+           giveni={G\bibinitperiod}}}%
+        {{hash=56fe0a5d219986cff42c508abfd38778}{%
+           family={Železný},
+           familyi={Ž\bibinitperiod},
+           given={Filip},
+           giveni={F\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Cham}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{4153b03b96d181649151dba6a7988cf0}
+      \strng{fullhash}{4153b03b96d181649151dba6a7988cf0}
+      \strng{bibnamehash}{4153b03b96d181649151dba6a7988cf0}
+      \strng{authorbibnamehash}{4153b03b96d181649151dba6a7988cf0}
+      \strng{authornamehash}{4153b03b96d181649151dba6a7988cf0}
+      \strng{authorfullhash}{4153b03b96d181649151dba6a7988cf0}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Joint European Conference on Machine Learning and Knowledge Discovery in Databases}
+      \field{month}{5}
+      \field{title}{Deep learning from label proportions for sequential data}
+      \field{year}{2019}
+      \field{pages}{39\bibrangedash 55}
+      \range{pages}{17}
+    \endentry
+    \entry{rahimian2021}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=155dc8ef2daa9293b77cc6da1ba2e681}{%
+           family={Rahimian},
+           familyi={R\bibinitperiod},
+           given={Mohammad\bibnamedelima Amin},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=3b4cdb50d20f5a2f8b916150c96ef999}{%
+           family={Sha},
+           familyi={S\bibinitperiod},
+           given={Mo},
+           giveni={M\bibinitperiod}}}%
+        {{hash=87fd17cf19c3cb59900756de3fe51dc7}{%
+           family={Hwang},
+           familyi={H\bibinitperiod},
+           given={Tae-Hoon},
+           giveni={T\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=3a142ad4bd0eab567a533815c0e39251}{%
+           family={Williams},
+           familyi={W\bibinitperiod},
+           given={Julian},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{e88263c552960a396beba794092b1ec5}
+      \strng{fullhash}{a79b146d3841fd093fe11321d142c1b4}
+      \strng{bibnamehash}{e88263c552960a396beba794092b1ec5}
+      \strng{authorbibnamehash}{e88263c552960a396beba794092b1ec5}
+      \strng{authornamehash}{e88263c552960a396beba794092b1ec5}
+      \strng{authorfullhash}{a79b146d3841fd093fe11321d142c1b4}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{AAAI Conference on Artificial Intelligence}
+      \field{number}{6}
+      \field{title}{Minimizing maximal regret in commitment games}
+      \field{volume}{35}
+      \field{year}{2021}
+      \field{pages}{5493\bibrangedash 5500}
+      \range{pages}{8}
+    \endentry
+    \entry{pappalardo2019}{article}{}
+      \name{author}{7}{}{%
+        {{hash=f1dc088fdc6d46f2361a7f0bb668aefe}{%
+           family={Pappalardo},
+           familyi={P\bibinitperiod},
+           given={Luca},
+           giveni={L\bibinitperiod}}}%
+        {{hash=1d375d5616731917814cbbc4718fb3d7}{%
+           family={Cintia},
+           familyi={C\bibinitperiod},
+           given={Paolo},
+           giveni={P\bibinitperiod}}}%
+        {{hash=0462c2ef2e0c05927373ea3dc18da6fd}{%
+           family={Rossi},
+           familyi={R\bibinitperiod},
+           given={Alessio},
+           giveni={A\bibinitperiod}}}%
+        {{hash=21466aed638de3b701e217eae66a35ba}{%
+           family={Massucco},
+           familyi={M\bibinitperiod},
+           given={Emanuele},
+           giveni={E\bibinitperiod}}}%
+        {{hash=a56d83e896383417c553388f0e01ad7a}{%
+           family={Ferragina},
+           familyi={F\bibinitperiod},
+           given={Paolo},
+           giveni={P\bibinitperiod}}}%
+        {{hash=a2cc2c3b41c34d28b00e8b61bf830b42}{%
+           family={Pedreschi},
+           familyi={P\bibinitperiod},
+           given={Dino},
+           giveni={D\bibinitperiod}}}%
+        {{hash=7b5335e9010800b63f5c2959f076d90f}{%
+           family={Giannotti},
+           familyi={G\bibinitperiod},
+           given={Fosca},
+           giveni={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{bb55b1b603362fbd54ec570284b360af}
+      \strng{fullhash}{cc588eadaa39c244fc0faa74989ec0f4}
+      \strng{bibnamehash}{bb55b1b603362fbd54ec570284b360af}
+      \strng{authorbibnamehash}{bb55b1b603362fbd54ec570284b360af}
+      \strng{authornamehash}{bb55b1b603362fbd54ec570284b360af}
+      \strng{authorfullhash}{cc588eadaa39c244fc0faa74989ec0f4}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Scientific Data}
+      \field{number}{1}
+      \field{title}{A public data set of spatio-temporal match events in soccer competitions}
+      \field{volume}{6}
+      \field{year}{2019}
+      \field{pages}{1\bibrangedash 15}
+      \range{pages}{15}
+    \endentry
+    \entry{decroos2020}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=699484d3f867b6b54ba22b93823469f0}{%
+           family={Decroos},
+           familyi={D\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=5f9ed160b91c65c59a8d61af7f1e5017}{%
+           family={Davis},
+           familyi={D\bibinitperiod},
+           given={Jesse},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer International Publishing}%
+      }
+      \strng{namehash}{790e352fc95be182a678c2e1448cae0c}
+      \strng{fullhash}{790e352fc95be182a678c2e1448cae0c}
+      \strng{bibnamehash}{790e352fc95be182a678c2e1448cae0c}
+      \strng{authorbibnamehash}{790e352fc95be182a678c2e1448cae0c}
+      \strng{authornamehash}{790e352fc95be182a678c2e1448cae0c}
+      \strng{authorfullhash}{790e352fc95be182a678c2e1448cae0c}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Machine Learning and Knowledge Discovery in Databases: European Conference, ECML PKDD 2019}
+      \field{title}{Player vectors: {Characterizing} soccer players' playing style from match event streams}
+      \field{year}{2020}
+      \field{pages}{569\bibrangedash 584}
+      \range{pages}{16}
+    \endentry
+    \entry{hosseini2016adaptive}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=4ecd913d5ba7c72727e6e0b239d935a2}{%
+           family={Hosseini},
+           familyi={H\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=a6c51a0e9d3a8edd919d87e245749d3d}{%
+           family={Swaminathan},
+           familyi={S\bibinitperiod},
+           given={Viswanathan},
+           giveni={V\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{f400ca7cb692ed8829fc50472bf33711}
+      \strng{fullhash}{f400ca7cb692ed8829fc50472bf33711}
+      \strng{bibnamehash}{f400ca7cb692ed8829fc50472bf33711}
+      \strng{authorbibnamehash}{f400ca7cb692ed8829fc50472bf33711}
+      \strng{authornamehash}{f400ca7cb692ed8829fc50472bf33711}
+      \strng{authorfullhash}{f400ca7cb692ed8829fc50472bf33711}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2016 IEEE International Symposium on Multimedia (ISM)}
+      \field{title}{Adaptive 360 VR video streaming: Divide and conquer}
+      \field{year}{2016}
+      \field{pages}{107\bibrangedash 110}
+      \range{pages}{4}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

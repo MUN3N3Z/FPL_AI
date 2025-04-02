@@ -6,8 +6,6 @@ from typing import Dict
 import os
 import subprocess
 from functools import lru_cache
-from typing import Tuple
-import pickle
 
 # A Premier League season has 380 fixtures; 20 teams
 GAMES_PER_GAMEWEEK = 10
@@ -68,11 +66,11 @@ class DixonColesModel:
         return (np.log(self._rho_correction(x, y, lambda_x, mu_y, rho)) + 
                 np.log(poisson.pmf(x, lambda_x)) + np.log(poisson.pmf(y, mu_y)))
 
-    @lru_cache(maxsize=None)
     def solve_parameters(self, season_start_year: str, gameweek: int = 0) -> Dict[str, float]:
         """
             - This function employs scipy's minimize optimization function to find the parameters that maximize the 
             likelihood function described in 'self._dc_log_like'
+            - Memoize the output to prevent recalculation of parameters that maximize the likelihood function
         """
         # Load fixture results data for previous season
         fixture_results_df = self._load_results(str(int(season_start_year) - 1))
@@ -112,15 +110,15 @@ class DixonColesModel:
             'fun': lambda x: sum(x[:20]) - 20
             }]  
         )
-        return dict(zip(["attack_"+team for team in teams] + 
+        params = dict(zip(["attack_"+team for team in teams] + 
                         ["defence_"+team for team in teams] +
                         ['rho', 'home_adv'],
                         opt_output.x))
+        return params
 
     def simulate_match(self, homeTeam: str, awayTeam: str, params: Dict[str, float], max_goals=10):
         """
             - This function ties the Dixon-Coles prediction model together and returns the match score matrix based on the model parameters
-            - Memoize the output matrix to prevent recalculation of parameters that maximize the likelihood function
         """
         def calc_means(param_dict, homeTeam, awayTeam):
             return [np.exp(param_dict['attack_'+homeTeam] + param_dict['defence_'+awayTeam] + param_dict['home_adv']),
@@ -133,5 +131,5 @@ class DixonColesModel:
                                                     team_avgs[1], params['rho']) for away_goals in range(2)]
                                     for home_goals in range(2)])
         output_matrix[:2,:2] = output_matrix[:2,:2] * correction_matrix
-        print(DixonColesModel.solve_parameters.cache_info())
+
         return output_matrix

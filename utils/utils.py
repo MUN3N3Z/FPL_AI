@@ -38,7 +38,7 @@ def id_to_team_converter_2023_24(team_id: int) -> str:
 def position_score_points_map(position: str) -> int:
     """ Map a player's position to FPL-based points for scoring a goal """
     position_points = {
-        "GKP": 10,
+        "GK": 10,
         "DEF": 6,
         "MID": 5,
         "FWD": 4
@@ -48,7 +48,7 @@ def position_score_points_map(position: str) -> int:
 def position_clean_sheet_points_map(position: str) -> int:
     """ Map a player's position to FPL-based points for assisting a goal """
     position_points = {
-        "GKP": 4,
+        "GK": 4,
         "DEF": 4,
         "MID": 1,
         "FWD": 0
@@ -68,3 +68,7 @@ def format_season_name(season_start_year: str) -> str:
     """ Create data file name based on the season_start_year """
     shortened_season_end_year = str(int(season_start_year) + 1)[2:]
     return f"{season_start_year + "-" + shortened_season_end_year}"
+
+def tril_weighted_sum(matrix: np.typing.NDArray) -> float:
+    """ Return the weighted score sum of the row team"""
+    pass

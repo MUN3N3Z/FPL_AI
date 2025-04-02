@@ -219,8 +219,14 @@ def simulate_fixture(fixture: pd.Series, players_ability_df: pd.DataFrame, posit
     home_team_benched = home_team_players_with_stats[~ home_team_players_with_stats["name"].isin(home_team_starting["name"])]
     away_team_benched = away_team_players_with_stats[~ away_team_players_with_stats["name"].isin(away_team_starting["name"])]
     
-    home_team_score, _ = np.unravel_index(np.tril(match_score_matrix).argmax(), match_score_matrix.shape)
-    _, away_team_score = np.unravel_index(np.triu(match_score_matrix).argmax(), match_score_matrix.shape)
+    # home_team_score, _ = np.unravel_index(np.tril(match_score_matrix).argmax(), match_score_matrix.shape)
+    # _, away_team_score = np.unravel_index(np.triu(match_score_matrix).argmax(), match_score_matrix.shape)
+    home_score_max, away_score_max = match_score_matrix.shape
+    flat_indices = np.random.choice(
+        a=(home_score_max * away_score_max), 
+        p=(match_score_matrix.flatten() / np.sum(match_score_matrix)
+    ))
+    home_team_score, away_team_score = np.unravel_index(indices=flat_indices, shape=match_score_matrix.shape)
    
     players_in_field = pd.concat(
         [home_team_starting, away_team_starting], 
@@ -258,6 +264,7 @@ def simulate_gameweek(season_start_year: str, gameweek: str, fixtures_df: pd.Dat
     # Prediction model
     dixon_coles_prediction_model = DixonColesModel()
     dixon_coles_team_parameters = dixon_coles_prediction_model.solve_parameters(season_start_year, int(gameweek))
+    
     fixture_points_df = []
     for _, fixture_row in fixtures_df.iterrows():
         match_score_matrix = dixon_coles_prediction_model.simulate_match(

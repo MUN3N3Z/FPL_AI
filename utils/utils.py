@@ -55,6 +55,16 @@ def position_clean_sheet_points_map(position: str) -> int:
     }
     return position_points[position]
 
+def position_num_players(position: str) -> int:
+    """ Map a position to the allowed number of players from the same position in an FPL team """
+    position_count = {
+        "GK": 2,
+        "DEF": 5,
+        "MID": 5,
+        "FWD": 3
+    }
+    return position_count[position]
+
 def string_list_to_np_array(string_list: str) -> np.array:
     """ Converts a string representation of a list to a numpy array """
     return np.array(ast.literal_eval(string_list))

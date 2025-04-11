@@ -4,12 +4,12 @@ Arsenal,Nott'm Forest,2,1
 Bournemouth,West Ham,1,1
 Brighton,Luton,4,1
 Everton,Fulham,0,1
-Sheffield United,Crystal Palace,0,1
+Sheffield Utd,Crystal Palace,0,1
 Newcastle,Aston Villa,5,1
 Brentford,Spurs,2,2
 Chelsea,Liverpool,1,1
 Man Utd,Wolves,1,0
-Nott'm Forest,Sheffield United,2,1
+Nott'm Forest,Sheffield Utd,2,1
 Fulham,Brentford,0,3
 Liverpool,Bournemouth,3,1
 Wolves,Brighton,1,4
@@ -26,10 +26,10 @@ Everton,Wolves,0,1
 Man Utd,Nott'm Forest,3,2
 Brighton,West Ham,1,3
 Burnley,Aston Villa,1,3
-Sheffield United,Man City,1,2
+Sheffield Utd,Man City,1,2
 Newcastle,Liverpool,1,2
 Luton,West Ham,1,2
-Sheffield United,Everton,2,2
+Sheffield Utd,Everton,2,2
 Brentford,Bournemouth,2,2
 Burnley,Spurs,2,5
 Chelsea,Nott'm Forest,0,1
@@ -42,7 +42,7 @@ Wolves,Liverpool,1,3
 Aston Villa,Crystal Palace,3,1
 Fulham,Luton,1,0
 Man Utd,Brighton,1,3
-Spurs,Sheffield United,2,1
+Spurs,Sheffield Utd,2,1
 West Ham,Man City,1,3
 Newcastle,Brentford,1,0
 Bournemouth,Chelsea,0,0
@@ -57,13 +57,13 @@ Arsenal,Spurs,2,2
 Brighton,Bournemouth,3,1
 Chelsea,Aston Villa,0,1
 Liverpool,West Ham,3,1
-Sheffield United,Newcastle,0,8
+Sheffield Utd,Newcastle,0,8
 Aston Villa,Brighton,6,1
 Bournemouth,Arsenal,0,4
 Everton,Luton,1,2
 Man Utd,Crystal Palace,0,1
 Newcastle,Burnley,2,0
-West Ham,Sheffield United,2,0
+West Ham,Sheffield Utd,2,0
 Wolves,Man City,2,1
 Spurs,Liverpool,2,1
 Nott'm Forest,Brentford,1,1
@@ -72,7 +72,7 @@ Luton,Burnley,1,2
 Luton,Spurs,0,1
 Burnley,Chelsea,1,4
 Everton,Bournemouth,3,0
-Fulham,Sheffield United,3,1
+Fulham,Sheffield Utd,3,1
 Man Utd,Brentford,2,1
 Crystal Palace,Nott'm Forest,0,0
 Brighton,Liverpool,2,2
@@ -86,12 +86,12 @@ Man City,Brighton,2,1
 Newcastle,Crystal Palace,4,0
 Nott'm Forest,Luton,2,2
 Chelsea,Arsenal,2,2
-Sheffield United,Man Utd,1,2
+Sheffield Utd,Man Utd,1,2
 Aston Villa,West Ham,4,1
 Spurs,Fulham,2,0
 Crystal Palace,Spurs,1,2
 Chelsea,Brentford,0,2
-Arsenal,Sheffield United,5,0
+Arsenal,Sheffield Utd,5,0
 Bournemouth,Burnley,2,1
 Wolves,Newcastle,2,2
 West Ham,Everton,0,1
@@ -104,7 +104,7 @@ Brentford,West Ham,3,2
 Burnley,Crystal Palace,0,2
 Everton,Brighton,1,1
 Man City,Bournemouth,6,1
-Sheffield United,Wolves,2,1
+Sheffield Utd,Wolves,2,1
 Newcastle,Arsenal,1,0
 Nott'm Forest,Aston Villa,2,0
 Luton,Liverpool,1,1
@@ -115,7 +115,7 @@ Crystal Palace,Everton,2,3
 Man Utd,Luton,1,0
 Bournemouth,Newcastle,2,0
 Aston Villa,Fulham,3,1
-Brighton,Sheffield United,1,1
+Brighton,Sheffield Utd,1,1
 Liverpool,Brentford,3,0
 West Ham,Nott'm Forest,3,2
 Chelsea,Man City,4,4
@@ -124,14 +124,14 @@ Burnley,West Ham,1,2
 Luton,Crystal Palace,2,1
 Newcastle,Chelsea,4,1
 Nott'm Forest,Brighton,2,3
-Sheffield United,Bournemouth,1,3
+Sheffield Utd,Bournemouth,1,3
 Brentford,Arsenal,0,1
 Spurs,Aston Villa,1,2
 Everton,Man Utd,0,3
 Fulham,Wolves,3,2
 Arsenal,Wolves,2,1
 Brentford,Luton,3,1
-Burnley,Sheffield United,5,0
+Burnley,Sheffield Utd,5,0
 Nott'm Forest,Everton,0,1
 Newcastle,Man Utd,1,0
 Bournemouth,Aston Villa,2,2
@@ -144,7 +144,7 @@ Luton,Arsenal,3,4
 Brighton,Brentford,2,1
 Crystal Palace,Bournemouth,0,2
 Fulham,Nott'm Forest,5,0
-Sheffield United,Liverpool,0,2
+Sheffield Utd,Liverpool,0,2
 Aston Villa,Man City,1,0
 Man Utd,Chelsea,2,1
 Everton,Newcastle,3,0
@@ -152,7 +152,7 @@ Spurs,West Ham,1,2
 Crystal Palace,Liverpool,1,2
 Brighton,Burnley,1,1
 Man Utd,Bournemouth,0,3
-Sheffield United,Brentford,1,0
+Sheffield Utd,Brentford,1,0
 Wolves,Nott'm Forest,1,1
 Aston Villa,Arsenal,1,0
 Everton,Chelsea,2,0
@@ -160,7 +160,7 @@ Fulham,West Ham,5,0
 Luton,Man City,1,2
 Spurs,Newcastle,4,1
 Nott'm Forest,Spurs,0,2
-Chelsea,Sheffield United,2,0
+Chelsea,Sheffield Utd,2,0
 Man City,Crystal Palace,2,2
 Newcastle,Fulham,3,0
 Burnley,Everton,0,2
@@ -169,7 +169,7 @@ Brentford,Aston Villa,1,2
 West Ham,Wolves,3,0
 Liverpool,Man Utd,0,0
 Crystal Palace,Brighton,1,1
-Aston Villa,Sheffield United,1,1
+Aston Villa,Sheffield Utd,1,1
 West Ham,Man Utd,2,0
 Fulham,Burnley,0,2
 Luton,Newcastle,1,0
@@ -179,7 +179,7 @@ Liverpool,Arsenal,1,1
 Wolves,Chelsea,2,1
 Newcastle,Nott'm Forest,1,3
 Bournemouth,Fulham,3,0
-Sheffield United,Luton,2,3
+Sheffield Utd,Luton,2,3
 Burnley,Liverpool,0,2
 Man Utd,Aston Villa,3,2
 Brentford,Wolves,1,4
@@ -190,7 +190,7 @@ Arsenal,West Ham,0,2
 Luton,Chelsea,2,3
 Aston Villa,Burnley,3,2
 Crystal Palace,Brentford,3,1
-Man City,Sheffield United,2,0
+Man City,Sheffield Utd,2,0
 Wolves,Everton,3,0
 Nott'm Forest,Man Utd,2,1
 Fulham,Arsenal,2,1
@@ -204,13 +204,13 @@ Everton,Aston Villa,0,0
 Man Utd,Spurs,2,2
 Arsenal,Crystal Palace,5,0
 Brentford,Nott'm Forest,3,2
-Sheffield United,West Ham,2,2
+Sheffield Utd,West Ham,2,2
 Bournemouth,Liverpool,0,4
 Brighton,Wolves,0,0
 Nott'm Forest,Arsenal,1,2
 Fulham,Everton,0,0
 Luton,Brighton,4,0
-Crystal Palace,Sheffield United,3,2
+Crystal Palace,Sheffield Utd,3,2
 Aston Villa,Newcastle,1,3
 Man City,Burnley,3,1
 Spurs,Brentford,3,2
@@ -221,7 +221,7 @@ Everton,Spurs,2,2
 Brighton,Crystal Palace,4,1
 Burnley,Fulham,2,2
 Newcastle,Luton,4,4
-Sheffield United,Aston Villa,0,5
+Sheffield Utd,Aston Villa,0,5
 Bournemouth,Nott'm Forest,1,1
 Chelsea,Wolves,2,4
 Man Utd,West Ham,3,0
@@ -230,7 +230,7 @@ Brentford,Man City,1,3
 Man City,Everton,2,0
 Fulham,Bournemouth,3,1
 Liverpool,Burnley,3,1
-Luton,Sheffield United,1,3
+Luton,Sheffield Utd,1,3
 Spurs,Brighton,2,1
 Wolves,Brentford,0,2
 Nott'm Forest,Newcastle,2,3
@@ -244,7 +244,7 @@ Newcastle,Bournemouth,2,2
 Nott'm Forest,West Ham,2,0
 Spurs,Wolves,1,2
 Man City,Chelsea,1,1
-Sheffield United,Brighton,0,5
+Sheffield Utd,Brighton,0,5
 Luton,Man Utd,1,2
 Everton,Crystal Palace,1,1
 Man City,Brentford,1,0
@@ -255,7 +255,7 @@ Crystal Palace,Burnley,3,0
 Man Utd,Fulham,1,2
 Bournemouth,Man City,0,1
 Arsenal,Newcastle,4,1
-Wolves,Sheffield United,1,0
+Wolves,Sheffield Utd,1,0
 West Ham,Brentford,4,2
 Brentford,Chelsea,2,2
 Everton,West Ham,1,3
@@ -266,9 +266,9 @@ Spurs,Crystal Palace,3,1
 Luton,Aston Villa,2,3
 Burnley,Bournemouth,0,2
 Man City,Man Utd,3,1
-Sheffield United,Arsenal,0,6
+Sheffield Utd,Arsenal,0,6
 Man Utd,Everton,2,0
-Bournemouth,Sheffield United,2,2
+Bournemouth,Sheffield Utd,2,2
 Crystal Palace,Luton,1,1
 Wolves,Fulham,2,1
 Arsenal,Brentford,2,1
@@ -286,7 +286,7 @@ Newcastle,West Ham,4,3
 Bournemouth,Everton,2,1
 Chelsea,Burnley,2,2
 Nott'm Forest,Crystal Palace,1,1
-Sheffield United,Fulham,3,3
+Sheffield Utd,Fulham,3,3
 Spurs,Luton,2,1
 Aston Villa,Wolves,2,0
 Brentford,Man Utd,1,1
@@ -300,7 +300,7 @@ West Ham,Spurs,1,1
 Arsenal,Luton,2,0
 Brentford,Brighton,0,0
 Man City,Aston Villa,4,1
-Liverpool,Sheffield United,3,1
+Liverpool,Sheffield Utd,3,1
 Chelsea,Man Utd,4,3
 Crystal Palace,Man City,2,4
 Aston Villa,Brentford,3,3
@@ -310,10 +310,10 @@ Luton,Bournemouth,2,1
 Wolves,West Ham,1,2
 Brighton,Arsenal,0,3
 Man Utd,Liverpool,2,2
-Sheffield United,Chelsea,2,2
+Sheffield Utd,Chelsea,2,2
 Spurs,Nott'm Forest,3,1
 Newcastle,Spurs,4,0
-Brentford,Sheffield United,2,0
+Brentford,Sheffield Utd,2,0
 Burnley,Brighton,1,1
 Man City,Luton,5,1
 Nott'm Forest,Wolves,2,2
@@ -323,7 +323,7 @@ West Ham,Fulham,0,2
 Arsenal,Aston Villa,0,2
 Chelsea,Everton,6,0
 Luton,Brentford,1,5
-Sheffield United,Burnley,1,4
+Sheffield Utd,Burnley,1,4
 Wolves,Arsenal,0,2
 Everton,Nott'm Forest,2,0
 Aston Villa,Bournemouth,3,1
@@ -333,12 +333,12 @@ Arsenal,Chelsea,5,0
 Wolves,Bournemouth,0,1
 Crystal Palace,Newcastle,2,0
 Everton,Liverpool,2,0
-Man Utd,Sheffield United,4,2
+Man Utd,Sheffield Utd,4,2
 Brighton,Man City,0,4
 West Ham,Liverpool,2,2
 Fulham,Crystal Palace,1,1
 Man Utd,Burnley,1,1
-Newcastle,Sheffield United,5,1
+Newcastle,Sheffield Utd,5,1
 Wolves,Luton,2,1
 Everton,Brentford,1,0
 Aston Villa,Chelsea,2,2
@@ -350,7 +350,7 @@ Luton,Everton,1,1
 Arsenal,Bournemouth,3,0
 Brentford,Fulham,0,0
 Burnley,Newcastle,1,4
-Sheffield United,Nott'm Forest,1,3
+Sheffield Utd,Nott'm Forest,1,3
 Man City,Wolves,5,1
 Brighton,Aston Villa,1,0
 Chelsea,West Ham,5,0
@@ -358,7 +358,7 @@ Liverpool,Spurs,4,2
 Crystal Palace,Man Utd,4,0
 Fulham,Man City,0,4
 Bournemouth,Brentford,1,2
-Everton,Sheffield United,1,0
+Everton,Sheffield Utd,1,0
 Newcastle,Brighton,1,1
 Spurs,Burnley,2,1
 West Ham,Luton,3,1
@@ -378,4 +378,4 @@ Crystal Palace,Aston Villa,5,0
 Liverpool,Wolves,2,0
 Luton,Fulham,2,4
 Man City,West Ham,3,1
-Sheffield United,Spurs,0,3
+Sheffield Utd,Spurs,0,3

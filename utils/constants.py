@@ -9,8 +9,10 @@ ASSIST_POINTS: int = 3
 HALF_GAME_MINUTES: int = 45
 NUM_PLAYERS_IN_FPL: int = 15
 POSITIONS: List[str] = ["GK, DEF, MID, FWD"]
-TEAM_COUNT_LIMIT:int = 3
+TEAM_COUNT_LIMIT: int = 3
 NUM_BENCHED_PLAYERS: int = 4
+PROMOTED_TEAMS_2022_23: List[str] = ["Luton", "Sheffield Utd", "Burnley"]
+RELEGATED_TEAMS_2022_23: List[str] = ["Leicester", "Southampton", "Leeds"]
 
 # Sampling constants
 RANDOM_SEED: int = 19

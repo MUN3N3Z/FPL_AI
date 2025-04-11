@@ -1,8 +1,8 @@
-PWD /Users/munene/Desktop/YALE/Spring2025/CSEC491/FPL_AI/Writeup
+PWD /Users/munene/Desktop/YALE/Spring2025/CSEC491/FPL_AI/writeup
 INPUT /usr/local/texlive/2022/texmf.cnf
 INPUT /usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2022/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/munene/Desktop/YALE/Spring2025/CSEC491/FPL_AI/Writeup/main.tex
+INPUT /Users/munene/Desktop/YALE/Spring2025/CSEC491/FPL_AI/writeup/main.tex
 OUTPUT main.log
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/report.cls
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/report.cls

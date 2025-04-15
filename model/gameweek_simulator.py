@@ -9,9 +9,7 @@ from constants import (
     MINUTES_THRESHOLD_FOR_FULL_PARTICIPATION_POINTS,
     HALF_GAME_MINUTES,
     RANDOM_SEED,
-    STARTING_PLAYERS,
     DATA_FOLDER,
-    PLAYER_ABILITY_FILE,
     ASSIST_POINTS,
 )
 from dixon_coles import DixonColesModel
@@ -22,6 +20,7 @@ from utils import (
     position_clean_sheet_points_map,
     random_bool,
     format_season_name,
+    choose_formation,
 )
 import pickle
 
@@ -36,6 +35,7 @@ class GameweekSimulator:
         gameweek: str,
         fixtures_df: pd.DataFrame,
         position_minutes_df: pd.DataFrame,
+        players_ability_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """
         Simulate a gameweek by sampling player stats, minutes played, and scoring points.
@@ -50,10 +50,6 @@ class GameweekSimulator:
             pd.DataFrame: Player points for the gameweek.
         """
         season_folder_name = format_season_name(season_start_year)
-        player_ability_file_path = os.path.join(
-            DATA_FOLDER, season_folder_name, PLAYER_ABILITY_FILE
-        )
-        players_ability_df = pd.read_csv(filepath_or_buffer=player_ability_file_path)
 
         dixon_coles_prediction_model = DixonColesModel()
 
@@ -83,7 +79,7 @@ class GameweekSimulator:
             )
             fixture_points_df.append(fixture_points)
 
-        gameweek_player_points_df = pd.concat(fixture_points_df, ignore_index=True)
+        gameweek_player_points_df = pd.concat(fixture_points_df)
         return gameweek_player_points_df
 
     def _simulate_fixture(
@@ -99,21 +95,22 @@ class GameweekSimulator:
         # Sample individual players' stats
         players_with_stats = self._sample_player_stats(players_ability_df)
 
-        # Sample starting lineups
         home_team = players_with_stats[
             players_with_stats["team"] == fixture["home_team"]
         ]
-        home_team_starting = home_team.sample(
-            n=STARTING_PLAYERS, weights="start_prob", replace=False
-        )
         away_team = players_with_stats[
             players_with_stats["team"] == fixture["away_team"]
         ]
-        away_team_starting = away_team.sample(
-            n=STARTING_PLAYERS, weights="start_prob", replace=False
+
+        # Sample starting lineups
+        home_team_starting = self._sample_starting_lineup(
+            home_team, fixture["home_team"]
+        )
+        away_team_starting = self._sample_starting_lineup(
+            away_team, fixture["away_team"]
         )
 
-        # Sample minutes played for starting lineup players
+        # Sample minutes played for starting lineup players - both teams at once
         starting_players_home_away_minutes = pd.concat(
             [home_team_starting, away_team_starting], axis=0
         )
@@ -143,6 +140,7 @@ class GameweekSimulator:
         )
 
         # Award points
+        starting_players_home_away_minutes["sampled_points"] = 0
         players_in_field = self._score_minutes_played(
             fixture,
             starting_players_home_away_minutes,
@@ -166,27 +164,51 @@ class GameweekSimulator:
 
         return players_in_field
 
+    def _sample_starting_lineup(self, team: pd.DataFrame, team_id: int) -> pd.DataFrame:
+        """Choose 11 starting players using a random popular EPL formation"""
+        formation = choose_formation(team_id)
+        print(team[["name", "team", "position"]])
+        print("-----------------------------------------------------------")
+        starting_lineup = [
+            team[team["position"] == position].sample(
+                n=num_players, weights="start_prob", replace=False
+            )
+            for position, num_players in formation.items()
+        ]
+        starting_lineup_df = pd.concat(starting_lineup, axis=0)
+        return starting_lineup_df
+
     def _sample_player_stats(
         self, team_players_abilities: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Sample each player's probability of starting, scoring, and assisting.
         """
-        team_players_abilities["ρ_β"] = team_players_abilities.ρ_β.apply(
+        team_players_abilities.loc[:, "ρ_β"] = team_players_abilities.ρ_β.apply(
             func=lambda np_str_array: string_list_to_np_array(np_str_array)
         )
         with pm.Model():
-            # Fromat priors for sampling
+            # convert players' abilities from np objects to arrays for Tensor sampling
+            dirichlet_alphas = np.array(
+                [array for array in team_players_abilities["ρ_β"].values]
+            )
             # Enforced a minimum value i.e. 1e-3 for alpha and beta values to ensure they're always positive
-            dirichlet_alphas = np.stack(team_players_abilities["ρ_β"].values)
-            score_alphas = np.maximum(team_players_abilities["ω_α"].values, 1e-3)
-            score_betas = np.maximum(team_players_abilities["ω_β"].values, 1e-3)
-            assist_alphas = np.maximum(team_players_abilities["ψ_α"].values, 1e-3)
-            assist_betas = np.maximum(team_players_abilities["ψ_β"].values, 1e-3)
+            score_alphas = np.maximum(
+                team_players_abilities["ω_α"].values.astype(np.float64), 1e-3
+            )
+            score_betas = np.maximum(
+                team_players_abilities["ω_β"].values.astype(np.float64), 1e-3
+            )
+            assist_alphas = np.maximum(
+                team_players_abilities["ψ_α"].values.astype(np.float64), 1e-3
+            )
+            assist_betas = np.maximum(
+                team_players_abilities["ψ_β"].values.astype(np.float64), 1e-3
+            )
             # Define the distributions
             pm.Dirichlet(
                 "start_sub_unused_dirichlet_dist",
-                a=dirichlet_alphas,
+                a=dirichlet_alphas.astype(np.float64),
                 shape=(len(team_players_abilities), 3),
             )
             pm.Beta(
@@ -219,7 +241,7 @@ class GameweekSimulator:
         sampled_data = pd.DataFrame(
             {
                 "name": team_players_abilities["name"].values,
-                "start_prob": start_sub_unused_dirichlet_samples[:, 0],
+                "" "start_prob": start_sub_unused_dirichlet_samples[:, 0],
                 "sub_prob": start_sub_unused_dirichlet_samples[:, 1],
                 "unused_prob": start_sub_unused_dirichlet_samples[:, 2],
                 "score_prob": score_beta_samples,
@@ -285,7 +307,6 @@ class GameweekSimulator:
         Score points based on minutes played.
         """
         players_in_field.index = players_in_field["name"]
-        players_in_field["points"] = 0
         subbed_players = []
         for _, player_row in players_in_field.iterrows():
             # Score minutes played
@@ -297,47 +318,58 @@ class GameweekSimulator:
                     >= MINUTES_THRESHOLD_FOR_FULL_PARTICIPATION_POINTS
                 ):
                     player_game_score += 2
-                    substitute_player = (
-                        home_team_benched.sample(
+                    if player_row["team"] == fixture["home_team"]:
+                        substitute_player = home_team_benched.sample(
                             1,
                             weights="sub_prob",
                             replace=False,
                             random_state=RANDOM_SEED,
                         )
-                        if player_row["team"] == fixture["home_team"]
-                        else away_team_benched.sample(
+                        home_team_benched = home_team_benched[
+                            ~home_team_benched["name"].isin(substitute_player["name"])
+                        ]
+                    else:
+                        substitute_player = away_team_benched.sample(
                             1,
                             weights="sub_prob",
                             replace=False,
                             random_state=RANDOM_SEED,
                         )
-                    )
-                    substitute_player["points"] = 1
+                        away_team_benched = away_team_benched[
+                            ~away_team_benched["name"].isin(substitute_player["name"])
+                        ]
+                    substitute_player["sampled_points"] = 1
                     substitute_player["minutes_played"] = (
                         MATCH_MINUTES - player_row["minutes_played"]
                     )  # Assume replacement player is never taken off
                 else:
                     player_game_score += 1
-                    substitute_player = (
-                        home_team_benched.sample(
+                    if player_row["team"] == fixture["home_team"]:
+                        substitute_player = home_team_benched.sample(
                             1,
                             weights="sub_prob",
                             replace=False,
                             random_state=RANDOM_SEED,
                         )
-                        if player_row["team"] == fixture["home_team"]
-                        else away_team_benched.sample(
+                        home_team_benched = home_team_benched[
+                            ~home_team_benched["name"].isin(substitute_player["name"])
+                        ]
+                    else:
+                        substitute_player = away_team_benched.sample(
                             1,
                             weights="sub_prob",
                             replace=False,
                             random_state=RANDOM_SEED,
                         )
-                    )
+                        away_team_benched = away_team_benched[
+                            ~away_team_benched["name"].isin(substitute_player["name"])
+                        ]
+                    # Determine if sub player is eligible for full playing points (> 60 minutes)
                     if player_row["minutes_played"] < HALF_GAME_MINUTES:
                         substitute_player_minutes = HALF_GAME_MINUTES + (
                             HALF_GAME_MINUTES - player_row["minutes_played"]
                         )
-                        substitute_player["points"] = (
+                        substitute_player["sampled_points"] = (
                             2
                             if substitute_player_minutes
                             >= MINUTES_THRESHOLD_FOR_FULL_PARTICIPATION_POINTS
@@ -345,7 +377,7 @@ class GameweekSimulator:
                         )
                         substitute_player["minutes_played"] = substitute_player_minutes
                     else:
-                        substitute_player["points"] = 1
+                        substitute_player["sampled_points"] = 1
                         substitute_player["minutes_played"] = (
                             MATCH_MINUTES - player_row["minutes_played"]
                         )
@@ -353,7 +385,9 @@ class GameweekSimulator:
             else:
                 # Player played full match
                 player_game_score += 2
-            players_in_field.loc[player_row["name"], "points"] = player_game_score
+            players_in_field.loc[
+                player_row["name"], "sampled_points"
+            ] = player_game_score
 
         subbed_players.append(players_in_field)
         players_in_field = pd.concat(subbed_players, axis=0)
@@ -367,23 +401,39 @@ class GameweekSimulator:
         Score points for goals and assists.
         """
         players_in_field.index = players_in_field["name"]
+        # Two copies for removing sampled players by assist or goals separately
+        assists_copy = players_in_field[players_in_field["team"] == team]
+        scoring_copy = assists_copy.copy()
         for _ in range(team_score):
-            team_played = players_in_field[players_in_field["team"] == team]
-            scorer = team_played.sample(
-                1, weights="score_prob", replace=random_bool()
+            replace_scorer = random_bool()
+            scorer = scoring_copy.sample(
+                1,
+                weights="score_prob",
+                replace=replace_scorer,
+                random_state=RANDOM_SEED,
             )  # Introduce noise?
             scorer_position = scorer.iloc[0]["position"]
             players_in_field.loc[
-                scorer.iloc[0]["name"], "points"
+                scorer.iloc[0]["name"], "sampled_points"
             ] += position_score_points_map(scorer_position)
+            # Randomly keep/remove scorer from scoring sample
+            if replace_scorer:
+                scoring_copy = scoring_copy[scoring_copy.name.isin(scorer.name)]
+
+            replace_assister = random_bool()
             # Assume that all goals have attributed assists
-            assister = team_played.sample(
+            assister = assists_copy.sample(
                 1,
                 weights="assist_prob",
-                replace=random_bool(),
+                replace=replace_assister,
                 random_state=RANDOM_SEED,
             )
-            players_in_field.loc[assister.iloc[0]["name"], "points"] += ASSIST_POINTS
+            players_in_field.loc[
+                assister.iloc[0]["name"], "sampled_points"
+            ] += ASSIST_POINTS
+            # Randomly keep/remove scorer from scoring sample
+            if replace_assister:
+                assists_copy = assists_copy[assists_copy.name.isin(scorer.name)]
         return players_in_field
 
     def _score_clean_sheets(
@@ -402,6 +452,6 @@ class GameweekSimulator:
         ]
         for _, player_row in team_players.iterrows():
             players_in_field.loc[
-                player_row["name"], "points"
+                player_row["name"], "sampled_points"
             ] += position_clean_sheet_points_map(player_row["position"])
         return players_in_field

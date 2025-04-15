@@ -139,7 +139,7 @@ class FPLEnv(gym.Env):
             # action: (sell_player, buy_player)
             sell_player, buy_player = action["transfer"]
             sampled_reward = self._sampled_gameweek_player_performance.loc[
-                buy_player, "points"
+                buy_player, "sampled_points"
             ]
             M2 = sampled_reward**2  # Second moment
             q_values[(sell_player, buy_player)] = {
@@ -166,8 +166,8 @@ class FPLEnv(gym.Env):
         """
         # Greedily sort players using their expected points per unit cost
         self._sampled_gameweek_player_performance["value"] = (
-            self._sampled_gameweek_player_performance["points"]
-            / self._sampled_gameweek_player_performance["cost"]
+            self._sampled_gameweek_player_performance["sampled_points"]
+            / self._sampled_gameweek_player_performance["price"]
         )
         sorted_sampled_gameweek_player_performance = (
             self._sampled_gameweek_player_performance.sort_values(
@@ -205,13 +205,13 @@ class FPLEnv(gym.Env):
             - At least 1 FWD
         """
         sorted_team_descending = self._team.sort_values(
-            by="points", ascending=True, inplace=False
+            by="sampled_points", ascending=True, inplace=False
         )
         bench = []
         benched_positions_count = defaultdict(int)
         # Bench one GK by default
         goal_keepers = self._team[self._team["position"] == "GK"].sort_values(
-            by="points", inplace=False, ascending=True
+            by="sampled_points", inplace=False, ascending=True
         )
         bench.append(goal_keepers.iloc[0].copy())
         for _, player_row in sorted_team_descending.iterrows():
@@ -232,7 +232,7 @@ class FPLEnv(gym.Env):
             "budget": self._budget,
             "team": self._team,
             "player_performance_prediction": self._sampled_gameweek_player_performance.filter(
-                ["name", "team", "points"]
+                ["name", "team", "sampled_points"]
             ),
         }
 
@@ -265,12 +265,12 @@ class FPLEnv(gym.Env):
 
     def _select_captain(self):
         """Select player with highest expected points as captain"""
-        return self._team["points"].idxmax()
+        return self._team["sampled_points"].idxmax()
 
     def _select_vice_captain(self):
         """Select player with second highest expected points as vice captain"""
         team_without_captain = self._team.drop(index=self._captain, inplace=False)
-        vice_captain = team_without_captain["points"].idxmax()
+        vice_captain = team_without_captain["sampled_points"].idxmax()
 
         return vice_captain
 
@@ -294,13 +294,13 @@ class FPLEnv(gym.Env):
             ~self._sampled_gameweek_player_performance["name"].isin(self._team["name"])
         ]
         unselected_players["value"] = (
-            unselected_players["cumulative_points"] / unselected_players["price"]
+            unselected_players["cumulative_real_points"] / unselected_players["price"]
         )
         unselected_players.sort_values(by="value", inplace=True, ascending=False)
 
         team_with_player_value = self._team.copy()
         team_with_player_value["value"] = (
-            team_with_player_value["cumulative_points"]
+            team_with_player_value["cumulative_real_points"]
             / team_with_player_value["price"]
         )
         # Drop Goalkeepers - naturally have lower points/cost
@@ -323,7 +323,8 @@ class FPLEnv(gym.Env):
     def _calculate_gw_points(self) -> int:
         """Sum sampled points for self._playing and double captain's points according to FPL rules"""
         return (
-            self._playing["points"].sum() + self._playing.loc[self._captain, "points"]
+            self._playing["sampled_points"].sum()
+            + self._playing.loc[self._captain, "sampled_points"]
         )
 
     def _update_q_value(self, action_index: int, reward: int) -> None:
@@ -430,7 +431,7 @@ class FPLEnv(gym.Env):
 
                     _, buy_player = new_action
                     sampled_reward = self._sampled_gameweek_player_performance.loc[
-                        buy_player, "points"
+                        buy_player, "sampled_points"
                     ]
                     M2 = sampled_reward**2  # Second moment
                     self._q_values[new_action] = {

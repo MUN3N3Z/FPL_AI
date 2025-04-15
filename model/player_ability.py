@@ -26,6 +26,8 @@ class PlayerAbility:
                 "position",
                 "team",
                 "GW",
+                "value",
+                "total_points",
             ]
         )
         self.player_ability = self._create_model()
@@ -43,7 +45,6 @@ class PlayerAbility:
         """
 
         current_season = format_season_name(self._season)
-
         current_season_gw_data = self._seasonal_gameweek_player_data.gameweek_data[
             current_season
         ]
@@ -85,7 +86,9 @@ class PlayerAbility:
             compiled_gw_data["name"].isin(current_season_players["name"])
         ]
         grouped_compiled_data = compiled_gw_data.groupby(["name"])
-        print(f"Matched players: {len(grouped_compiled_data['name'].unique())}")
+        print(
+            f"Player abilities matched players: {len(grouped_compiled_data['name'].unique())}"
+        )
 
         for (player_name,), player_data in grouped_compiled_data:
             ρ_observed = np.array(

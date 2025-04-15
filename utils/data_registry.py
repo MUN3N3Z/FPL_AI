@@ -47,7 +47,7 @@ class DataRegistry:
         # Script to clean up the data - player names and starting stats
         # self.standardize_data()
 
-    def load_gameweek_data(self, gw_data_columns: List[str] = None) -> None:
+    def load_gameweek_data(self, gw_data_columns: List[str] | None) -> None:
         """
         - Use ISO-8859-1 file encoding to load seasonal gameweek and player data into the registry.
         - "gw_data_columns" describes the columns to filter in the merged_gw.csv data files
@@ -63,6 +63,7 @@ class DataRegistry:
                     self.gameweek_data[season] = self.gameweek_data[season].filter(
                         items=gw_data_columns
                     )
+
                 self.player_data[season] = pd.read_csv(
                     player_file_path, encoding="ISO-8859-1"
                 )

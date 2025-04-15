@@ -1,6 +1,10 @@
 import numpy as np
 import ast
 import random
+import pandas as pd
+from typing import Dict, Tuple
+from data_registry import DataRegistry
+from constants import RANDOM_SEED, POSITIONS
 
 TEAM_ID_MAP_2023_24 = {
     "Arsenal": 1,
@@ -70,7 +74,7 @@ def string_list_to_np_array(string_list: str) -> np.array:
 
 def random_bool():
     """Return a random boolean value"""
-    random.seed(19)
+    random.seed(RANDOM_SEED)
     return random.choice([True, False])
 
 
@@ -78,3 +82,71 @@ def format_season_name(season_start_year: str) -> str:
     """Create data file name based on the season_start_year"""
     shortened_season_end_year = str(int(season_start_year) + 1)[2:]
     return f"{season_start_year + " - " + shortened_season_end_year}"
+
+
+def update_gw_data(
+    gameweek_data: pd.DataFrame,
+    player_points_df: pd.DataFrame,
+    cumulative_real_player_points: Dict[str, int],
+    gw: int,
+) -> Tuple[pd.DataFrame, Dict[str, int]]:
+    """
+    - Updates the passed player_points_df with players' cumulative real points and prices
+    """
+    gameweek_data.index = gameweek_data["name"]
+
+    player_points_df["cumulative_real_points"] = 0
+    player_points_df[
+        "price"
+    ] = 1000.0  # Players without price tags will be unpurchasable by default
+
+    for _, player_row in player_points_df.iterrows():
+        player_name = player_row["name"]
+        # Scale players' pricess appropriately: $£55 == £5.5
+        player_row["price"] = gameweek_data.loc[player_name, "value"] / 10
+        if gw > 1:
+            player_name = player_row["name"]
+            cumulative_real_player_points[player_name] += gameweek_data.loc[
+                player_name, "total_points"
+            ]
+            player_row["cumulative_real_points"] = cumulative_real_player_points[
+                player_name
+            ]
+
+    return player_points_df, cumulative_real_player_points
+
+
+def choose_formation(team_id: int) -> Dict[str, int]:
+    """
+    - Choose a formation based of EPL statistics for the 2023/24 season
+    - Source: https://www.premierleague.com/news/4030093
+    """
+    # 4-5-1 -> 4-2-3-1
+    # 3-6-1 -> 3-4-2-1
+    formation_map = {
+        "Arsenal": "4-3-3",
+        "Aston Villa": "4-5-1",
+        "Bournemouth": "4-5-1",
+        "Brentford": "3-5-2",
+        "Brighton": "4-5-1",
+        "Burnley": "4-4-2",
+        "Chelsea": "4-5-1",
+        "Crystal Palace": "4-3-3",
+        "Everton": "4-5-1",
+        "Fulham": "4-5-1",
+        "Liverpool": "4-5-1",  # Modified from 4-3-3 (inadequate forwards)
+        "Luton": "3-6-1",
+        "Man City": "4-5-1",
+        "Man Utd": "4-5-1",
+        "Newcastle": "4-4-2",  # Modified from 4-3-3 (inadequate forwards)
+        "Nott'm Forest": "4-5-1",
+        "Sheffield Utd": "3-5-2",
+        "Spurs": "4-5-1",
+        "West Ham": "4-5-1",
+        "Wolves": "3-6-1",
+    }
+    # 1-(formation sequence) represents the Goalkeeper
+    formation = ("1-" + formation_map[(id_to_team_converter_2023_24(team_id))]).split(
+        "-"
+    )
+    return {position: int(count) for position, count in zip(POSITIONS, formation)}

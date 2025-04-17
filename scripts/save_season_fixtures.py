@@ -2,6 +2,7 @@ from fpl.models import Fixture
 import requests
 import pandas as pd
 import argparse
+from utils import format_season_name
 
 """
     - This script retrieves and saves the fixtures for a specific season.
@@ -32,6 +33,7 @@ def aggregate_and_save_fixtures(season_start_year: str) -> None:
     csv file '/data/<season>/fixtures.csv
     """
     season_fixtures_df = pd.DataFrame()
+    season_name = format_season_name(season_start_year)
     for gameweek in range(1, GAMEWEEK_COUNT + 1):
         gameweek_fixtures_df = get_gameweek_fixtures(season_start_year, str(gameweek))
         season_fixtures_df = pd.concat(
@@ -39,7 +41,7 @@ def aggregate_and_save_fixtures(season_start_year: str) -> None:
         )
     shortened_season_end_year = str(int(season_start_year) + 1)[2:]
     season_fixtures_df.to_csv(
-        f"./data/{season_start_year + " - " + shortened_season_end_year}/fixtures.csv",
+        f"./data/{season_name}/fixtures.csv",
         index=False,
     )
 

@@ -29,6 +29,8 @@ colorlinks,bookmarksopen,bookmarksnumbered,citecolor=black,urlcolor=black
 
 \usepackage{titlesec} % Add this line
 \usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 % Customize chapter title format
 \titleformat{\chapter}[hang] 
@@ -39,6 +41,7 @@ colorlinks,bookmarksopen,bookmarksnumbered,citecolor=black,urlcolor=black
 \usepackage[sorting=none]{biblatex}
 \addbibresource{references.bib}
 \hypersetup{linkcolor=black}
+
 \begin{document}
 
 \input{titlepage}
@@ -85,7 +88,6 @@ And for everything in between.
 
 
 \printbibliography
-
 \appendix
 \chapter{Appendix Title} \label{ch:appendices}
 \input{appendices} 

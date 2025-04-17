@@ -38,9 +38,6 @@ class FPLEnv(gym.Env):
         super().__init__()
         # environment data
         self._sampled_gameweek_player_performance = player_performance_samples
-        self._sampled_gameweek_player_performance.index = player_performance_samples[
-            "name"
-        ]
 
         # environment parameters
         self._initial_budget = initial_budget
@@ -62,8 +59,8 @@ class FPLEnv(gym.Env):
                     high=100,  # Reasonable upperbound for player's points in a single gameweek
                     shape=(
                         len(player_performance_samples),
-                        3,
-                    ),  # Predicted points, mean_real_past_points, fixture_difficulty
+                        2,
+                    ),  # Predicted points, cumulative_real_points, (fixture_difficulty?)
                 ),
             }
         )
@@ -84,8 +81,8 @@ class FPLEnv(gym.Env):
         self._captain = self._select_captain()
         self._vice_captain = self._select_vice_captain()
 
-        self._action_subset = self._initialize_actions()
-        self._q_values = self._initialize_q_values()
+        self.action_subset = self._initialize_actions()
+        self.q_values = self._initialize_q_values()
 
         observation = self._get_observation()
         info = {}
@@ -97,9 +94,9 @@ class FPLEnv(gym.Env):
     ) -> Tuple[Dict[str, Any], int, bool, Dict[str, Any]]:
         """
         - Perform a state transition in the Markov Decision Problem (MDP) modeling of FPL
-        - action: index into self._action_subset
+        - action: index into self.action_subset
         """
-        selected_action = self._action_subset[action_index]
+        selected_action = self.action_subset[action_index]
         transfer_cost = 0
         if selected_action["transfer"]:
             # Possibility of having no good transfer to make
@@ -119,7 +116,7 @@ class FPLEnv(gym.Env):
         self._current_gw += 1
 
         # Use Bayesian Q-learning and Value of Perfect Information to update action subset
-        self._update_action_subset(action_index, adjusted_points)
+        self._updateaction_subset(action_index, adjusted_points)
 
         done = self._current_gw >= GAMEWEEK_COUNT
         observation = self._get_observation()
@@ -135,7 +132,7 @@ class FPLEnv(gym.Env):
     def _initialize_q_values(self) -> DefaultDict[Tuple[str, str], Dict[str, Any]]:
         """Initialize Bayesian Q-values for the action subset"""
         q_values = defaultdict(dict)
-        for action in self._action_subset:
+        for action in self.action_subset:
             # action: (sell_player, buy_player)
             sell_player, buy_player = action["transfer"]
             sampled_reward = self._sampled_gameweek_player_performance.loc[
@@ -207,13 +204,13 @@ class FPLEnv(gym.Env):
         sorted_team_descending = self._team.sort_values(
             by="sampled_points", ascending=True, inplace=False
         )
-        bench = []
         benched_positions_count = defaultdict(int)
         # Bench one GK by default
-        goal_keepers = self._team[self._team["position"] == "GK"].sort_values(
-            by="sampled_points", inplace=False, ascending=True
-        )
-        bench.append(goal_keepers.iloc[0].copy())
+        benched_goal_keeper_idx = sorted_team_descending[
+            sorted_team_descending["position"] == "GK"
+        ].sampled_points.idxmax()
+        bench = [sorted_team_descending.loc[benched_goal_keeper_idx]]
+        sorted_team_descending = sorted_team_descending.drop(benched_goal_keeper_idx)
         for _, player_row in sorted_team_descending.iterrows():
             if len(bench) == NUM_BENCHED_PLAYERS:
                 break
@@ -236,22 +233,28 @@ class FPLEnv(gym.Env):
             ),
         }
 
-    def _make_transfer(self, action: Dict) -> None:
+    def _make_transfer(self, action: Tuple[str, str]) -> None:
         """
         - Replace players stipulated in actions["transfer"]
         - See shape of actions in self._initialize_actions()
-        - The list of actions must be feasible before calling self._make_transfer()
+        - The action must be feasible before calling self._make_transfer()
         - Return: The cost of making the transfer
         """
         sell_player_name, buy_player_name = action["transfer"]
+
         self._team = self._team.drop(index=sell_player_name)
-        self._team[len(self._team)] = self._sampled_gameweek_player_performance.loc[
-            buy_player_name, :
-        ]
+
+        self._team = pd.concat(
+            [
+                self._team,
+                self._sampled_gameweek_player_performance.loc[[buy_player_name]],
+            ],
+        )
+
         self._budget += self._sampled_gameweek_player_performance.loc[
             sell_player_name, "price"
         ]
-        self.budget -= self._sampled_gameweek_player_performance.loc[
+        self._budget -= self._sampled_gameweek_player_performance.loc[
             buy_player_name, "price"
         ]
 
@@ -259,9 +262,6 @@ class FPLEnv(gym.Env):
         self._free_transfers = max(self._free_transfers - 1, 0)
 
         return transfer_cost
-
-    def _get_player_points(self):
-        pass
 
     def _select_captain(self):
         """Select player with highest expected points as captain"""
@@ -293,10 +293,10 @@ class FPLEnv(gym.Env):
         unselected_players = self._sampled_gameweek_player_performance[
             ~self._sampled_gameweek_player_performance["name"].isin(self._team["name"])
         ]
-        unselected_players["value"] = (
+        unselected_players.loc[:, "value"] = (
             unselected_players["cumulative_real_points"] / unselected_players["price"]
         )
-        unselected_players.sort_values(by="value", inplace=True, ascending=False)
+        unselected_players = unselected_players.sort_values(by="value", ascending=False)
 
         team_with_player_value = self._team.copy()
         team_with_player_value["value"] = (
@@ -308,15 +308,15 @@ class FPLEnv(gym.Env):
             team_with_player_value["position"] != "GK"
         ]
         weakest_player = team_with_player_value.sort_values(
-            by="value", inplace="False", ascending=True
-        ).iloc[:0]
+            by="value", inplace=False, ascending=True
+        ).iloc[0]
         for _, player_row in unselected_players.iterrows():
             if (
-                player_row["position"] == weakest_player["position"].values[0]
-                and player_row["price"] <= weakest_player["price"].values[0]
+                player_row["position"] == weakest_player["position"]
+                and player_row["price"] <= weakest_player["price"]
             ):
                 # (sell_player, buy_player)
-                return weakest_player["name"].values[0], player_row["name"]
+                return weakest_player["name"], player_row["name"]
 
         return None
 
@@ -332,18 +332,18 @@ class FPLEnv(gym.Env):
         - Update the Bayesian Q-value associated with the action index using
         normal-gamma moment updating
         """
-        action = self._action_subset[action_index]["transfer"]
-        λ = self._q_values[action]["λ"]
-        μ = self._q_values[action]["μ"]
-        β = self._q_values[action]["β"]
+        action = self.action_subset[action_index]["transfer"]
+        λ = self.q_values[action]["λ"]
+        μ = self.q_values[action]["μ"]
+        β = self.q_values[action]["β"]
 
-        self._q_values[action]["λ"] += 1
-        self._q_values[action]["α"] += 0.5
+        self.q_values[action]["λ"] += 1
+        self.q_values[action]["α"] += 0.5
         # Update μ and β using moment updating
-        self._q_values[action]["μ"] += ((λ * μ) + reward) / self._q_values[action]["λ"]
-        self._q_values[action]["β"] += β + (
-            (0.5 * λ * (reward - μ) ** 2) / self._q_values[action]["λ"]
-        )
+        self.q_values[action]["μ"] = ((λ * μ) + reward) / self.q_values[action]["λ"]
+        self.q_values[action]["β"] += (0.5 * λ * (reward - μ) ** 2) / self.q_values[
+            action
+        ]["λ"]
 
         return None
 
@@ -352,45 +352,50 @@ class FPLEnv(gym.Env):
         - Calculate the Value of Perfect Information for an action
         - Action: (sell_player_name, buy_player_name)
         """
-        best_action = max(
-            self._q_values, key=lambda action: self._q_values[action]["μ"]
-        )
-        best_q_value = self._q_values[best_action]["μ"]
+        best_action = max(self.q_values, key=lambda action: self.q_values[action]["μ"])
+        best_q_value = self.q_values[best_action]["μ"]
         second_best_q_value = max(
             [
-                self._q_values[action]["μ"]
-                for action in self._q_values.keys()
+                self.q_values[action]["μ"]
+                for action in self.q_values.keys()
                 if action != best_action
             ],
             default=0,
         )
         # Parameters for t-distribution
-        ν = 2 * self._q_values[action]["α"]
+        ν = 2 * self.q_values[action]["α"]
         σ = np.sqrt(
-            self._q_values[action]["β"]
-            * (1 + 1 / self._q_values[action]["λ"])
-            / self._q_values[action]["α"]
+            self.q_values[action]["β"]
+            * (1 + 1 / self.q_values[action]["λ"])
+            / self.q_values[action]["α"]
         )
 
+        # Get the mean for this action
+        μ = self.q_values[action]["μ"]
         # Calculate VPI
-        t_distribution = stats.t(df=ν, loc=self._q_values[action]["μ"], scale=σ)
+        t_distribution = stats.t(df=ν, loc=0, scale=1)  # Standard t-distribution
         if action == best_action:
             #  For the best action, learning only helps if its true value turns out worse than estimate
             #  of second-best action
+            threshold = (second_best_q_value - μ) / σ
             vpi = σ * t_distribution.pdf(
-                (second_best_q_value - self._q_values[action]["μ"]) / σ
-            ) - (self._q_values[action]["μ"] - second_best_q_value)
+                threshold * (1 - t_distribution.cdf(threshold))
+                + t_distribution.pdf(threshold)
+            )
         else:
             # Other actions' vpi only matter is their true value turns out to be better than estimated
             # value of best action
-            vpi = σ * t_distribution.pdf(
-                (best_q_value - self._q_values[action]["μ"]) / σ
-            ) - (self._q_values[action]["μ"] - best_q_value)
-
+            threshold = (best_q_value - μ) / σ
+            vpi = σ * (
+                threshold * t_distribution.cdf(threshold)
+                + t_distribution.pdf(threshold)
+            )
+            # Invert since we're using standardized t-distribution
+            vpi = -vpi
         # VPi should be non-negative
         return max(0, vpi)
 
-    def _update_action_subset(self, selected_action_index: int, reward):
+    def _updateaction_subset(self, selected_action_index: int, reward):
         """
         - Update the action subset in place based on Bayesian Q-learning, replacing low-value actions with new, promising ones
         using the Value of Perfect Information (VPI) approach
@@ -399,16 +404,14 @@ class FPLEnv(gym.Env):
 
         # Calculate VPI for all actions
         for action_index in range(self._action_subspace_size):
-            action = self._action_subset[action_index]["transfer"]
-            self._q_values[action]["vpi"] = self._calculate_vpi(action)
+            action = self.action_subset[action_index]["transfer"]
+            self.q_values[action]["vpi"] = self._calculate_vpi(action)
 
-        best_action = max(
-            self._q_values, key=lambda action: self._q_values[action]["μ"]
-        )
-        best_q_value = self._q_values[best_action]["μ"]
+        best_action = max(self.q_values, key=lambda action: self.q_values[action]["μ"])
+        best_q_value = self.q_values[best_action]["μ"]
 
         #  Replace actions where q_hat + VPI < best_q with new actions
-        for action, q_value_dict in self._q_values.items():
+        for action, q_value_dict in self.q_values.items():
             if action != best_action:
                 q_hat_vpi = q_value_dict["μ"] + q_value_dict["vpi"]
                 if q_hat_vpi < best_q_value:
@@ -417,12 +420,12 @@ class FPLEnv(gym.Env):
                     old_action_index = next(
                         (
                             index
-                            for index, action_dict in enumerate(self._action_subset)
+                            for index, action_dict in enumerate(self.action_subset)
                             if action_dict["transfer"] == action
                         ),
                         None,
                     )
-                    self._action_subset[old_action_index] = {
+                    self.action_subset[old_action_index] = {
                         "transfer": new_action,
                         "captain": None,  # Determined dynamically
                         "vice_captain": None,  # Determined dynamically
@@ -434,13 +437,13 @@ class FPLEnv(gym.Env):
                         buy_player, "sampled_points"
                     ]
                     M2 = sampled_reward**2  # Second moment
-                    self._q_values[new_action] = {
+                    self.q_values[new_action] = {
                         "μ": sampled_reward,
                         "λ": LAMBDA,
                         "β": THETA**2 * M2,
                         "α": ALPHA,
                         "vpi": 0.0,
                     }
-                    self._q_values.pop(action)
+                    self.q_values.pop(action)
 
         return None

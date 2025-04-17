@@ -1,7 +1,310 @@
-This section might vary depending on the field of research. Consider this the approach, design, or architecture of the proposed system. You can also include implementation if it applies to your research.
+\section{Introduction to Methodology}
+My methodological apprach in this project can be divided into three: modeling beliefs on players' abilities in a Bayesian manner, modeling FPL's team selection process as a Belief-State Markov Decision Process (BSMDP), and solving the MDP using Bayesian Q-learning. This methodology is similar to the one described in the paper - Competing with Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains \cite{matthews2012}. I have, however, made my own adjustments to this methodology in ways that I believe improved my model.
 
-Include at least one figure. Figure that shows the architecture of the proposed system, concepts of the proposed algorithm, etc. One figure that you could put into a slide that tells your idea. 
+\section{Modeling players' abilities}
+Modeling a player's ability in a manner that captured the uncertainity of their performance in games was important in this project. As such, I took a Bayesian apprach to model this belief by maintaining a distribution over possible performance levels. Furthermore, a Bayesian model allowed me to incorporate domain knowledge through priors using performance data from previous seasons. This was crucial in giving good players a higher baseline even when they experience a slump in their performance. The players' abilities I sought to model are the probabilities of a player: 
+\begin{itemize}
+    \item scoring a goal
+    \item assisting a goal
+    \item starting a game
+    \item getting subbed during a game
+    \item remaining unused during a game
+\end{itemize}
+
+Defining the following terms is essential in describing my methodology. For the $i$-th gameweek, we define:
+\begin{itemize}
+    \item $M_i$ as the set of matches in gameweek $i$.
+    \item $P_i$ as the set of players available for selection in gameweek $i$.
+    \item $A_i$ as the set of actions available in gameweek $i$, where $a \in A_i$ is a subset of $P_i$ and observes all team selection constraints.
+    \item $p_i \in P_i$ is associated with its FPL-designated position $pos(p_i)$ and price $pr(p_i)$.
+    \item $\tau_p \in \tau$ is a system of distributions representing the player's performance/influence on the matchplay.
+    \item $O_i$ is the set of match observations in gameweek $i$.
+    \item $o \in O_i$ includes both the result of the matches and the performance of the players in the selected team e.g. goals, assists, clean sheets, yellow cards, red cards, bonus points. The probability of each $o \in O_i$ is somehow dependent on the players' characteristics ($\tau$) i.e. a team with strong attackers is more likely to score goals, therefore, $P(o | \tau)$ is dependent on $\tau$.
+    \item $R(o, a_{prev}, a_{curr})$ is the reward function, which returns the points scored by the selected team $a_{curr}$, given the match observations $o$. The previous team $a_{prev}$ is also provided to penalize the agent for any poor player transfers or transfers beyond the allowed number.
+\end{itemize}
+
+I use three distributions to model players' abilities:
+\begin{itemize}
+    \item $\rho_p$ - a three-state categorical distribution representing the player's probability of starting a match, being substituted, or not playing at all i.e. (start, sub, unused).
+    \item $\omega_p$ - a Bernoulli/Binomial distribution over a single trial, representing the probability of a player scoring a goal given he was playiong at the time
+    \item $\psi_p$ - a Bernoulli distribution representing the probability of a player providing an assist given he was playing at the time
+\end{itemize}
+Using a Bayesian approach allowed me to leverage the respective distributions' conjugates to update the players' priors (belief) using data from previous seasons. I defined uniform priors for all players as described in \cite{matthews2012} as follows: $$\omega_p \sim Beta(1, 1), \psi_p \sim Beta(1, 1),  \rho_p \sim Dirichlet(\frac{1}{4}, \frac{1}{4}, \frac{1}{4})$$
+
+I further defined four multinomial distributions $S_{pos}$, one for each position - to describe the how long players who play the same position are likely to play, given they start a match. These distributions were defined using a Dirichlet distribution, modeling the probability a player from the respective position $pos$ leaving the match at minute $x$, where $0 \le x \le 90$. 
+
+Samples of a player's ability, $\tau_p$, and minutes played in a game, given they were in the starting lineup, is drawn from these conjugate distributions
+
+I simulate a gameweek by simulating each fixture in the gameweek as follows (The procedure focuses on the home team for conciseness but is also applicable to the away team):
+\begin{itemize}
+    \item Define $P_H$ and $P_A$ as the set of players available the home and away teams respectively. I used formation frequency data from the English Premier League to determine individual team compositions. As such, I assigned each team a default formation as follows:
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|}
+            \hline
+            Team & Formation \\ \hline
+            AVL, BHA, BOU, CHE, FUL, MCI, MUN, TOT, WHU & 4-2-3-1    \\ \hline
+            ARS, CRY, LIV, NEW & 4-3-3  \\ \hline
+            LUT, WOL & 3-4-2-1 \\ \hline
+            BRE, SHU & 3-5-1 \\ \hline
+            EVE & 4-4-1-1 \\ \hline
+            BUR (classic) & 4-4-2 \\ \hline
+            NFO & 4-2-3-1 \\ \hline
+        \end{tabular}
+        \caption{Favored formations for the 2023/24 Premier League Season}
+        \label{tab:example_table}
+    \end{table}
+    \item I, however, had to make some modifications when constituting these teams using the aforementioned formations. In the case where a team does not have enough forwards to fill the required number as per their assigned formation (as was the case with Totttenham and Newcastle), I used midfielders instead. Further, since Premier League data does not distinguish between attacking and defensive midfielders, I simplified formations with such distinctions e.g. 3-4-2-1 and 4-2-3-1 by grouping both as general midfielders.
+    \item Sample $\tau_p$ for each player $p \in P_H$  from the belief model $Pr(\tau_p | b_i)$
+    \item Randomly select eleven players from $P_H$ in proportion to their probability of starting the match i.e. $Pr(\rho_p = start)$ These players constitute the starting lineup $L_H$
+    \item The minute each player leaves the pitch is sampled from the $S_{pos}$ distribution for the player's position $pos$
+    \item Each player in $P_H$ and not in $L_H$ is assigned to the set of substitutes $U_H$
+    \item For every minute that a player in $L_H$ is set to get substituted:
+        \item We randomly select a player from $U_H$ to replace the outgoing player in proportion to the probability of the player being substituted i.e. $Pr(\rho_p = sub)$
+        \item The replacement is added to $L_H$ (removed from $U_H$). We further assume that the player being substituted is not substituted again in the same match.
+    \item We use the Dixon-Coles model \cite{dixon1997} predict the outcome of the fixture. The model extends the basic Poisson model for soccer prediction by assuming that goals scored by teams follow a Poisson distribution. It also accounts for team-specific attacking and defensive threats, and home advantage while adding a crucial correction for the dependency between team's scores, especially for low-scoring results (0-0, 1-0, 0-1, 1-1) I was fortunate to find a clean implementation of the Dixon-Coles model on David Sheehan's article on  Predicting Football Results with Statistical Modelling: Dixon-Coles and Time-Weighting* \cite{sheehan2018}
+    \item If a goal is scored, it is allocated to player $p$ with probability $Pr(\omega_p = 1)$ while an assist is allocated to player $p$ with probability $Pr(\psi_p = 1)$. I assume that every goal has attributed assist.
+    \item Other point scoring guidelines i.e. scoring minutes played and clean sheets proceed at described in \ref{ch:scoring_guide}
+\end{itemize}
+These point estimates were used in combination with the BSMDP reward function $R$ to approximate the immediate reward from performing an action
+
+\section{Modeling the FPl team selection problem}
+Similar to the prior problem of modeling players' abilities, selecting an FPL team faces the fundamental problem of making decisions under uncertainity. One doesn't know whether a player will start a game, get injured, or even how long they will play. This is why I opted for a Belief-State Markov Decision Process (BSMDP) as opposed to the standard MDP. The former assumes perfect knowledge of states.
+
+Fpl is inherently sequential - decisions in gameweek 1 affect options in gameweek 2 and beyond due to budget constraints, free transfer limitations, and team value changes based on player price fluctuations. As such, the BSMDP naturally captures the sequential nature of FPL team selection. I also reinfor
+
+The Belief State Markov Decision Process is defined by the tuple $(\mathcal{S}, \mathcal{A}, \mathcal{T}, \mathcal{R}, \mathcal{O}, \gamma)$, where:
+\begin{itemize}
+    \item $\mathcal{S}$ is the state space
+    \item $\mathcal{A}$ is the action space
+    \item $\mathcal{T}: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \rightarrow [0, 1]$ is the transition function
+    \item $\mathcal{R}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$ is the reward function
+    \item $\mathcal{O}$ is the observation space
+    \item $\gamma \in [0, 1)$ is the discount factor
+\end{itemize}
+
+In a belief state MDP, the agent maintains a belief distribution over possible states rather than knowing the exact state. We will now formalize each component in the context of the FPL environment.
+
+\subsection{State Space}
+
+The state space $\mathcal{S}$ in the FPL environment is multi-dimensional and consists of:
+
+\begin{align}
+\mathcal{S} = \{(B, \mathbf{T}, GW, \mathbf{P})\}
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $B \in \mathbb{R}^+$ represents the remaining budget (with initial value $B_0 = 100.0$)
+    \item $\mathbf{T} \in \mathcal{P}_{15}$ represents the current team of 15 players, where $\mathcal{P}$ is the set of all available players
+    \item $GW \in \{1, 2, ..., 38\}$ represents the current gameweek
+    \item $\mathbf{P} \in \mathbb{R}^{n \times 2}$ represents performance predictions for all $n$ players
+\end{itemize}
+
+Each player $p \in \mathcal{P}$ has attributes including:
+\begin{itemize}
+    \item Position $pos(p) \in \{\text{GK}, \text{DEF}, \text{MID}, \text{FWD}\}$
+    \item Team $team(p) \in \{1, 2, ..., 20\}$ 
+    \item Price $price(p) \in \mathbb{R}^+$
+    \item Expected points $E[points(p, gw)] \in \mathbb{R}^+$ for each gameweek $gw$
+\end{itemize}
+
+\subsection{Action Space} \label{action_space}
+
+The action space $\mathcal{A}$ consists of three main components:
+\begin{align}
+\mathcal{A} = \mathcal{A}_{transfer} \times \mathcal{A}_{captain} \times \mathcal{A}_{bench}
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $\mathcal{A}_{transfer} \subset \mathcal{P} \times \mathcal{P}$ represents possible player transfers (sell, buy)
+    \item $\mathcal{A}_{captain} \subset \mathcal{P}$ represents the choice of captain from the team
+    \item $\mathcal{A}_{bench} \subset \binom{\mathcal{P}}{4}$ represents the choice of 4 players to bench
+\end{itemize}
+
+In the implementation, the action space is simplified to selecting among a subset of promising actions as suggested in \cite{matthews2012}. In each iteration of training the reinforcement learning agent, we replaced the weakest member of the simplified action set with a promising member of the unexplored action space. I defined a player $p$'s $value$ as their scored points per unit cost i.e. $\frac{points(p)}{price(p)}$
+
+\begin{align}
+\mathcal{A}_{simplified} = \{0, 1, 2\}
+\end{align}
+where each index corresponds to a dynamically maintained action subset.
+
+\subsection{Constraints}
+The FPL environment imposes several constraints as described in \ref{ch:team_selection_constraints}
+
+\subsection{Transition Dynamics}
+
+The transition function $\mathcal{T}$ for the FPL environment can be decomposed as follows:
+
+\begin{align}
+\mathcal{T}((B, \mathbf{T}, GW, \mathbf{P}), a, (B', \mathbf{T}', GW', \mathbf{P}')) = 
+\begin{cases}
+1 & \text{if conditions are met} \\
+0 & \text{otherwise}
+\end{cases}
+\end{align}
+
+Where the conditions are:
+\begin{align}
+GW' &= GW + 1\\
+\mathbf{T}' &= (\mathbf{T} \setminus \{p_{sell}\}) \cup \{p_{buy}\} \text{ if } a \text{ includes a transfer}\\
+B' &= B + price(p_{sell}) - price(p_{buy}) \text{ if } a \text{ includes a transfer}\\
+\mathbf{P}' &= f(GW') \text{ (updated player performance predictions)}
+\end{align}
+
+The transition is deterministic given the action and the player performance predictions.
+
+\subsection{Reward Function}
+
+The reward function $\mathcal{R}$ is defined as the points earned in a gameweek minus any transfer penalties. The captain's points are counted twice as per FPL special features \ref{ch:special_features}
+
+\begin{align}
+\mathcal{R}((B, \mathbf{T}, GW, \mathbf{P}), a) &= \sum_{p \in \mathbf{T}_{playing}} points(p, GW) \nonumber \\
+&\quad + points(captain, GW) - transfer\_cost
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $\mathbf{T}_{playing} \subset \mathbf{T}$ is the subset of 11 players not on the bench
+    \item $captain \in \mathbf{T}_{playing}$ is the selected captain
+    \item $transfer\_cost = 4 \times \max(0, num\_transfers - free\_transfers)$
+\end{itemize}
 
 
-Include actual implementation details. 
-Describe the implementation language, platform, location, and dependencies on the packages.
+\section{Solving the FPL team selection Problem}
+Bayesian Q-learning is particularly well-suited for solving the FPL BSMDP since it directly incorporates uncertainty about the value function itself. Rather than maintaining a point estimate of Q-values as in standard Q-learning, it maintains a probability distribution over possible Q-values. This helps deal with uncertainities about the true value of performing a transfer action $a \in \mathcal{A}$. Further, it makes better use of the relatively few data points (38 gameweeks), by incorporating prior knowledge from previous gameweeks.
+
+For each potential action $a = (p_{sell}, p_{buy})$, the agent maintains a belief distribution over the Q-value as follows:
+
+\begin{align}
+    Q(s, a) \sim \mathcal{NG}(\mu_{a}, \lambda_{a}, \alpha_{a}, \beta_{a})
+\end{align}
+
+Where $\mathcal{NG}$ is a Normal-Gamma distribution with:
+\begin{itemize}
+    \item $\mu_{a}$: mean estimate of the Q-value
+    \item $\lambda_{a}$: precision parameter
+    \item $\alpha_{a}$: shape parameter
+    \item $\beta_{a}$: rate parameter
+\end{itemize}
+
+\subsection{Bayesian Q-Value Update}
+
+After taking action $a$ and observing reward $r$, the belief distribution is updated according to the normal-gamma update rules:
+
+\begin{align}
+\lambda_{a}' &= \lambda_{a} + 1\\
+\alpha_{a}' &= \alpha_{a} + 0.5\\
+\mu_{a}' &= \frac{\lambda_{a} \mu_{a} + r}{\lambda_{a}'}\\
+\beta_{a}' &= \beta_{a} + \frac{0.5 \lambda_{a} (r - \mu_{a})^2}{\lambda_{a}'}
+\end{align}
+
+\subsection{Value of Perfect Information (VPI)}
+The environment uses the Value of Perfect Information (VPI) to balance exploration and exploitation as suggested in \cite{matthews2012}. For each action $a$, the VPI is calculated as:
+
+\begin{align}
+VPI(a) = \begin{cases}
+\sigma_a \cdot t_{\nu}(z) \cdot (1 - CDF_{\nu}(z)) + \sigma_a \cdot PDF_{\nu}(z) & \text{if } a = a^*\\
+\sigma_a \cdot z \cdot CDF_{\nu}(z) + \sigma_a \cdot PDF_{\nu}(z) & \text{if } a \neq a^*
+\end{cases}
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $a^*$ is the action with the highest estimated mean Q-value
+    \item $\nu = 2\alpha_a$ is the degrees of freedom for the t-distribution
+    \item $\sigma_a = \sqrt{\frac{\beta_a(1+1/\lambda_a)}{\alpha_a}}$ is the standard deviation
+    \item $z = \frac{Q(a') - \mu_a}{\sigma_a}$ where $Q(a')$ is the Q-value of the best alternative action if $a = a^*$, or the Q-value of the best action if $a \neq a^*$
+    \item $CDF_{\nu}$ and $PDF_{\nu}$ are the cumulative distribution function and probability density function of the t-distribution with $\nu$ degrees of freedom
+\end{itemize}
+
+\subsection{Action Selection and Exploration}
+
+The action selection mechanism combines exploitation (choosing the action with the highest estimated Q-value) with directed exploration using VPI:
+
+\begin{align}
+a_{selected} = \arg\max_a \{\mu_a + VPI(a)\}
+\end{align}
+
+Additionally, the environment dynamically updates the action subset by replacing actions with low utility (defined as $\mu_a + VPI(a) < \mu_{a^*}$) with newly generated promising actions as described in \ref{action_space}
+
+\subsection{Algorithm}
+The initial team is selected greedily based on expected points per unit cost:
+
+\begin{align}
+value(p) = \frac{E[points(p, 1)]}{price(p)}
+\end{align}
+
+The team is selected to maximize the sum of values while respecting the constraints on team composition, budget, and players per team.
+The overall algorithm for the FPL Belief State MDP is presented below:
+
+\begin{algorithm}
+\caption{FPL Belief State MDP Algorithm}
+\begin{algorithmic}[1]
+\State Initialize team $\mathbf{T}$ with players having highest points-per-cost
+\State Initialize budget $B = B_0$
+\State Initialize gameweek $GW = 1$
+\State Initialize action subset with promising transfers
+\State Initialize Bayesian Q-values $\mathcal{NG}(\mu_a, \lambda_a, \alpha_a, \beta_a)$ for each action
+\While{$GW \leq 38$}
+    \State Select action $a = \arg\max_a \{\mu_a + VPI(a)\}$
+    \State Execute transfer if specified by $a$
+    \State Select captain with highest expected points
+    \State Select bench players with lowest expected points while respecting formation rules
+    \State Calculate reward (gameweek points - transfer cost)
+    \State Update Bayesian Q-values using observed reward
+    \State Update VPI for all actions
+    \State Replace low-utility actions with new promising actions
+    \State $GW = GW + 1$
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\section{Data Collection Methods}
+Implementing this project would not have been possible without clean, publicly-available data sources. 
+
+The most important data source was the gameweek-by-gameweek data in the \href{https://github.com/MUN3N3Z/FPL_AI/tree/main/data}{\underline{data folder}} of my code repository that was cloned from the FPL Historical Dataset. The dataset is available in the \href{https://github.com/vaastav/Fantasy-Premier-League/tree/master}{\underline{Github repository}} \cite{anand2016fantasypremierleague}.
+
+While I later discovered that I could have retrieved season fixtures by manipulating the data from the forementioned repository, I ended up scraping fixture data from the unofficial Fantasy Premier League API using a \href{https://github.com/MUN3N3Z/FPL_AI/tree/main/scripts/save_season_fixtures.py}{\underline{Python script}}
+
+I also scraped fixture results i.e. home team, away team, home team goals, and away team goals from \href{www.football-data.co.uk}{football-data website}
+
+\section{Technology Stack}
+\subsection{Hardware Infrastructure}
+
+\begin{itemize}
+    \item Computational resources: Apple M2 Chip, 8 GB Ram, 256 GB Memory
+    \item Computing environment: Local workstation
+\end{itemize}
+
+\subsection{Software framework}
+\begin{itemize}
+    \item Operating System: macOS Sequoia 15.4
+    \item Programming Languages: Python
+    \item Integrated Development Environment (IDE): Visual Studion Code
+    \item Version Control: Git, GitHub
+\end{itemize}
+
+\subsection{Data Management}
+\begin{itemize}
+    \item Data Storage: GitHub, Local
+    \item Data Format: CSV, Pickled Python objectives
+    \item Data Processing Tools: Pandas
+\end{itemize}
+
+\subsection{Analysis \& Modeling}
+\begin{itemize}
+    \item Statistical Analysis Tools: Numpy, Pymc
+    \item Machine Learning Libraries: Scipy, Gymnasium
+    \item Visualization Tools: Matplotlib
+    \item Domain-Specific Libraries: fpl \cite{macLeod2019}
+\end{itemize}
+
+\subsection{Reproducibility Framework}
+\begin{itemize}
+    \item Environment Management: Miniconda virtual environment $fpl\_env$
+    \item Dependency Management: Miniconda 
+    \item Random Seed Control: Set $RANDOM\_ SEED$ variable in constants.py
+\end{itemize}
+

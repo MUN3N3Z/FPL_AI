@@ -93,26 +93,22 @@ def update_gw_data(
     """
     - Updates the passed player_points_df with players' cumulative real points and prices
     """
-    gameweek_data.index = gameweek_data["name"]
 
+    gameweek_data = gameweek_data[gameweek_data["name"].isin(player_points_df["name"])]
     player_points_df["cumulative_real_points"] = 0
-    player_points_df[
-        "price"
-    ] = 1000.0  # Players without price tags will be unpurchasable by default
-
-    for _, player_row in player_points_df.iterrows():
+    # Players without price tags will be unpurchasable by default
+    player_points_df["price"] = 1000.0
+    player_points_df["name_index"] = player_points_df["name"]
+    player_points_df.set_index("name_index", inplace=True)
+    for _, player_row in gameweek_data.iterrows():
         player_name = player_row["name"]
         # Scale players' pricess appropriately: $£55 == £5.5
-        player_row["price"] = gameweek_data.loc[player_name, "value"] / 10
+        player_points_df.loc[player_name, "price"] = float(player_row["value"]) / 10.0
         if gw > 1:
-            player_name = player_row["name"]
-            cumulative_real_player_points[player_name] += gameweek_data.loc[
-                player_name, "total_points"
-            ]
-            player_row["cumulative_real_points"] = cumulative_real_player_points[
-                player_name
-            ]
-
+            cumulative_real_player_points[player_name] += player_row["total_points"]
+            player_points_df.loc[
+                player_name, "cumulative_real_points"
+            ] = cumulative_real_player_points[player_name]
     return player_points_df, cumulative_real_player_points
 
 

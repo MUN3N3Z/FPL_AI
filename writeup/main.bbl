@@ -1137,6 +1137,77 @@
       \field{pages}{569\bibrangedash 584}
       \range{pages}{16}
     \endentry
+    \entry{sheehan2018}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=611443f741f60d9fa0e33d0fd9977d9a}{%
+           family={Sheehan},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{611443f741f60d9fa0e33d0fd9977d9a}
+      \strng{fullhash}{611443f741f60d9fa0e33d0fd9977d9a}
+      \strng{bibnamehash}{611443f741f60d9fa0e33d0fd9977d9a}
+      \strng{authorbibnamehash}{611443f741f60d9fa0e33d0fd9977d9a}
+      \strng{authornamehash}{611443f741f60d9fa0e33d0fd9977d9a}
+      \strng{authorfullhash}{611443f741f60d9fa0e33d0fd9977d9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://dashee87.github.io/football/python/predicting-football-results-with-statistical-modelling-dixon-coles-and-time-weighting/}}
+      \field{title}{Predicting Football Results With Statistical Modelling: Dixon-Coles and Time-Weighting}
+      \field{year}{2018}
+    \endentry
+    \entry{anand2016fantasypremierleague}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=1743240c1a46bfd7de7a72df3fb4a58a}{%
+           family={Anand},
+           familyi={A\bibinitperiod},
+           given={Vaastav},
+           giveni={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{1743240c1a46bfd7de7a72df3fb4a58a}
+      \strng{fullhash}{1743240c1a46bfd7de7a72df3fb4a58a}
+      \strng{bibnamehash}{1743240c1a46bfd7de7a72df3fb4a58a}
+      \strng{authorbibnamehash}{1743240c1a46bfd7de7a72df3fb4a58a}
+      \strng{authornamehash}{1743240c1a46bfd7de7a72df3fb4a58a}
+      \strng{authorfullhash}{1743240c1a46bfd7de7a72df3fb4a58a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Retrieved August 2022 from \url{https://github.com/vaastav/Fantasy-Premier-League/}}
+      \field{title}{{FPL Historical Dataset}}
+      \field{year}{2022}
+    \endentry
+    \entry{macLeod2019}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=44e85e879363ea50cdd33c959f015cb0}{%
+           family={MacLeod},
+           familyi={M\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=22283abe10d93f3c2c080c9e2cc76400}{%
+           family={MacDonald},
+           familyi={M\bibinitperiod},
+           given={Hayden},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{57c413a9e4ca863e81cbecf6ed0b5239}
+      \strng{fullhash}{57c413a9e4ca863e81cbecf6ed0b5239}
+      \strng{bibnamehash}{57c413a9e4ca863e81cbecf6ed0b5239}
+      \strng{authorbibnamehash}{57c413a9e4ca863e81cbecf6ed0b5239}
+      \strng{authornamehash}{57c413a9e4ca863e81cbecf6ed0b5239}
+      \strng{authorfullhash}{57c413a9e4ca863e81cbecf6ed0b5239}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{https://fpl.readthedocs.io/en/latest/index.html}
+      \field{title}{A Python wrapper for the Fantasy Premier League API}
+      \field{year}{2019}
+    \endentry
     \entry{hosseini2016adaptive}{inproceedings}{}
       \name{author}{2}{}{%
         {{hash=4ecd913d5ba7c72727e6e0b239d935a2}{%
@@ -1159,8 +1230,8 @@
       \strng{authorbibnamehash}{f400ca7cb692ed8829fc50472bf33711}
       \strng{authornamehash}{f400ca7cb692ed8829fc50472bf33711}
       \strng{authorfullhash}{f400ca7cb692ed8829fc50472bf33711}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{2016 IEEE International Symposium on Multimedia (ISM)}

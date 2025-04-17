@@ -167,8 +167,6 @@ class GameweekSimulator:
     def _sample_starting_lineup(self, team: pd.DataFrame, team_id: int) -> pd.DataFrame:
         """Choose 11 starting players using a random popular EPL formation"""
         formation = choose_formation(team_id)
-        print(team[["name", "team", "position"]])
-        print("-----------------------------------------------------------")
         starting_lineup = [
             team[team["position"] == position].sample(
                 n=num_players, weights="start_prob", replace=False
@@ -401,6 +399,18 @@ class GameweekSimulator:
         Score points for goals and assists.
         """
         players_in_field.index = players_in_field["name"]
+        scoring_rate_per_minute = (
+            -np.log(1 - players_in_field.score_prob) / MATCH_MINUTES
+        )
+        assisting_rate_per_minute = (
+            -np.log(1 - players_in_field.assist_prob) / MATCH_MINUTES
+        )
+        players_in_field["weighted_score_prob"] = 1 - np.exp(
+            -scoring_rate_per_minute * players_in_field.minutes_played
+        )
+        players_in_field["weighted_assist_prob"] = 1 - np.exp(
+            -assisting_rate_per_minute * players_in_field.minutes_played
+        )
         # Two copies for removing sampled players by assist or goals separately
         assists_copy = players_in_field[players_in_field["team"] == team]
         scoring_copy = assists_copy.copy()
@@ -408,7 +418,7 @@ class GameweekSimulator:
             replace_scorer = random_bool()
             scorer = scoring_copy.sample(
                 1,
-                weights="score_prob",
+                weights="weighted_score_prob",
                 replace=replace_scorer,
                 random_state=RANDOM_SEED,
             )  # Introduce noise?
@@ -424,7 +434,7 @@ class GameweekSimulator:
             # Assume that all goals have attributed assists
             assister = assists_copy.sample(
                 1,
-                weights="assist_prob",
+                weights="weighted_assist_prob",
                 replace=replace_assister,
                 random_state=RANDOM_SEED,
             )

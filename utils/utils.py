@@ -81,7 +81,7 @@ def random_bool():
 def format_season_name(season_start_year: str) -> str:
     """Create data file name based on the season_start_year"""
     shortened_season_end_year = str(int(season_start_year) + 1)[2:]
-    return f"{season_start_year + " - " + shortened_season_end_year}"
+    return f"{season_start_year + '-' + shortened_season_end_year}"
 
 
 def update_gw_data(

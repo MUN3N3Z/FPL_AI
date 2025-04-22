@@ -1,5 +1,6 @@
 import pandas as pd
 import argparse
+from utils import format_season_name
 
 
 def save_season_results(season_start_year: str) -> None:
@@ -9,9 +10,7 @@ def save_season_results(season_start_year: str) -> None:
     """
     url_season_repr = season_start_year[-2:] + str(int(season_start_year[-2:]) + 1)
     url = f"https://www.football-data.co.uk/mmz4281/{url_season_repr}/E0.csv"
-    file_system_season_repr = (
-        season_start_year + "-" + str(int(season_start_year[-2:]) + 1)
-    )
+    file_system_season_repr = format_season_name(season_start_year)
     csv_storage_path = f"../data/{file_system_season_repr}/fixture_results.csv"
     data = pd.read_csv(filepath_or_buffer=url)
     # Cleaning

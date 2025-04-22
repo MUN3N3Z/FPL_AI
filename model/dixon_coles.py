@@ -2,11 +2,16 @@ import numpy as np
 from scipy.stats import poisson
 from scipy.optimize import minimize
 import pandas as pd
-from typing import Dict
+from typing import Dict, List, Set
 import os
 import subprocess
 from pprint import pprint
-from constants import PROMOTED_TEAMS_2022_23, RELEGATED_TEAMS_2022_23
+from constants import (
+    PROMOTED_TEAMS_2021_22,
+    RELEGATED_TEAMS_2021_22,
+    PROMOTED_TEAMS_2022_23,
+    RELEGATED_TEAMS_2022_23,
+)
 
 # A Premier League season has 380 fixtures; 20 teams
 GAMES_PER_GAMEWEEK = 10
@@ -15,11 +20,12 @@ GAMES_PER_GAMEWEEK = 10
 class DixonColesModel:
     """
     - Creates a Dixon-Coles prediction model using fixture results from the previous season and
-    preceeding gameweeks if the 'gamweek' parameter is passed and is greater than 1
+    preceeding gameweeks if the 'gameweek' parameter is passed and is greater than 1
+    - Handles season transitions with promoted and relegated teams
     """
 
     def __init__(self):
-        pass
+        self.previous_params = None  # Store previously calculated parameters
 
     def _load_results(self, season_start_year: str) -> pd.DataFrame:
         """
@@ -35,12 +41,12 @@ class DixonColesModel:
             return pd.read_csv(filepath_or_buffer=fixture_results_path)
         except FileNotFoundError as e:
             # Save the respective fixture results file locally
-            relative_path = "save_season_results.py"
+            relative_path = "../scripts/save_season_results.py"
             absolute_path = os.path.abspath(relative_path)
             try:
-                # # Ensure the script is executable
+                # Ensure the script is executable
                 subprocess.run(
-                    ["python3", absolute_path, season_start_year], check=True
+                    ["python3", relative_path, season_start_year], check=True
                 )
             except subprocess.SubprocessError as e:
                 print(
@@ -73,7 +79,7 @@ class DixonColesModel:
     def _dc_log_like(self, x, y, alpha_x, beta_x, alpha_y, beta_y, rho, gamma):
         """
         - Constructs the likelihood function that will be maximized via Maximum Likelihood Estimation
-        to find the coeficients (parameters) that maximize it
+        to find the coefficients (parameters) that maximize it
         """
         lambda_x, mu_y = np.exp(alpha_x + beta_y + gamma), np.exp(alpha_y + beta_x)
         epsilon = 1e-10  # Small value to prevent log(0)
@@ -83,29 +89,116 @@ class DixonColesModel:
             + np.log(poisson.pmf(y, mu_y) + epsilon)
         )
 
+    def _get_current_season_teams(self, season_start_year: str) -> Set[str]:
+        """
+        Get the set of teams participating in the current season
+
+        Args:
+            season_start_year: Starting year of the season (e.g., "2022")
+
+        Returns:
+            Set of team names
+        """
+        # Get teams from previous season
+        prev_season_start_year = str(int(season_start_year) - 1)
+        prev_season_df = self._load_results(prev_season_start_year)
+        all_prev_teams = set(prev_season_df["HomeTeam"].unique())
+
+        # Determine promoted and relegated teams for this season
+        if season_start_year == "2022":
+            promoted_teams = set(PROMOTED_TEAMS_2022_23)
+            relegated_teams = set(RELEGATED_TEAMS_2022_23)
+        elif season_start_year == "2021":
+            promoted_teams = set(PROMOTED_TEAMS_2021_22)
+            relegated_teams = set(RELEGATED_TEAMS_2021_22)
+        else:
+            raise ValueError(
+                f"No promoted/relegated team data for season {season_start_year}"
+            )
+
+        # Create set of current teams by removing relegated and adding promoted
+        current_teams = (all_prev_teams - relegated_teams) | promoted_teams
+
+        return current_teams
+
     def solve_parameters(
         self, season_start_year: str, gameweek: int = 0
     ) -> Dict[str, float]:
         """
-        - This function employs scipy's minimize optimization function to find the parameters that maximize the
-        likelihood function described in 'self._dc_log_like'
-        """
-        # Load fixture results data for previous season
-        fixture_results_df = self._load_results(str(int(season_start_year) - 1))
-        if gameweek > 1:
-            # Retrieve current season's results till the previous gameweek
-            current_season_results = self._load_results(season_start_year).iloc[
-                : (GAMES_PER_GAMEWEEK * (gameweek - 1) + 1)
-            ]
-            fixture_results_df = pd.concat([fixture_results_df, current_season_results])
+        Find parameters that maximize likelihood function
 
+        Args:
+            season_start_year: Starting year of the season (e.g., "2022")
+            gameweek: Current gameweek (0 for pre-season)
+
+        Returns:
+            Dictionary of parameter values
+        """
+        # If we've already calculated parameters for this gameweek, return them
+        if self.previous_params is not None and gameweek == 0:
+            return self.previous_params
+
+        # Get the set of teams for the current season
+        current_teams = self._get_current_season_teams(season_start_year)
+
+        # Load fixture results data for previous season
+        prev_season_start_year = str(int(season_start_year) - 1)
+        prev_season_results_df = self._load_results(prev_season_start_year)
+
+        if gameweek > 0:
+            # Filter previous season results to only include current teams
+            prev_season_results_df = prev_season_results_df[
+                prev_season_results_df["HomeTeam"].isin(current_teams)
+                & prev_season_results_df["AwayTeam"].isin(current_teams)
+            ]
+
+            # Get current season results up to the previous gameweek
+            try:
+                current_season_df = self._load_results(season_start_year)
+                current_season_results = current_season_df.iloc[
+                    : (GAMES_PER_GAMEWEEK * (gameweek - 1)) + 1
+                ]
+
+                # Combine previous and current season data
+                fixture_results_df = pd.concat(
+                    [prev_season_results_df, current_season_results]
+                )
+            except FileNotFoundError:
+                # If current season data not available, use filtered previous season data
+                print(
+                    f"Warning: No data found for season {season_start_year}. Using only previous season data."
+                )
+                fixture_results_df = prev_season_results_df
+        else:
+            # If gameweek is 0, use only previous season data
+            fixture_results_df = prev_season_results_df
+
+        # Get unique teams in the dataset
         teams = np.sort(fixture_results_df["HomeTeam"].unique())
-        # check for no weirdness in fixture_results_df
         away_teams = np.sort(fixture_results_df["AwayTeam"].unique())
+
+        missing_home, missing_away = None, None
+        # Verify that home and away teams match
         if not np.array_equal(teams, away_teams):
-            raise ValueError("Something's not right")
+            missing_home = set(away_teams) - set(teams)
+            missing_away = set(teams) - set(away_teams)
+            print(f"Warning: Home and away team sets differ.")
+            print(f"Teams in away but not home: {missing_home}")
+            print(f"Teams in home but not away: {missing_away}")
+
+            # Filter to common teams to ensure consistent parameters
+            common_teams = set(teams).intersection(set(away_teams))
+            fixture_results_df = fixture_results_df[
+                fixture_results_df["HomeTeam"].isin(common_teams)
+                & fixture_results_df["AwayTeam"].isin(common_teams)
+            ]
+            teams = np.sort(list(common_teams))
+
         n_teams = len(teams)
-        # random initialisation of model parameters
+        print(f"Fitting model with {n_teams} teams:")
+        print(", ".join(teams))
+
+        # Random initialization of model parameters
         init_vals = np.concatenate(
             (
                 np.random.uniform(0, 1, (n_teams)),  # attack strength
@@ -114,7 +207,7 @@ class DixonColesModel:
             )
         )
 
-        def estimate_paramters(params):
+        def estimate_parameters(params):
             score_coefs = dict(zip(teams, params[:n_teams]))
             defend_coefs = dict(zip(teams, params[n_teams : (2 * n_teams)]))
             rho, gamma = params[-2:]
@@ -133,12 +226,18 @@ class DixonColesModel:
             ]
             return -sum(log_like)
 
+        # Constraint: sum of attack strengths = n_teams
+        constraints = [{"type": "eq", "fun": lambda x: sum(x[:n_teams]) - n_teams}]
+
+        # Optimize
         opt_output = minimize(
-            fun=estimate_paramters,
+            fun=estimate_parameters,
             x0=init_vals,
             options={"disp": True, "maxiter": 100},
-            constraints=[{"type": "eq", "fun": lambda x: sum(x[:20]) - 20}],
+            constraints=constraints,
         )
+
+        # Create parameter dictionary
         params = dict(
             zip(
                 ["attack_" + team for team in teams]
@@ -147,40 +246,51 @@ class DixonColesModel:
                 opt_output.x,
             )
         )
-        # TODO: Create a function that does this dynamically
-        # Impute newly-promoted teams with median stats
-        if gameweek == 1:
-            mean_attack = np.median(
-                [
-                    attack_est
-                    for key, attack_est in params.items()
-                    if key.split("_")[0] == "attack"
-                ]
-            )
-            mean_defence = np.median(
-                [
-                    defence_est
-                    for key, defence_est in params.items()
-                    if key.split("_")[0] == "defence"
-                ]
-            )
-            for promoted, relegated in zip(
-                PROMOTED_TEAMS_2022_23, RELEGATED_TEAMS_2022_23
-            ):
-                print(promoted, relegated)
-                params[f"attack_{promoted}"] = mean_attack
-                params[f"defence_{promoted}"] = mean_defence
-                params.pop(f"attack_{relegated}")
-                params.pop(f"defence_{relegated}")
-        pprint(params)
+
+        # Add parameters for missing teams if needed
+        current_teams = self._get_current_season_teams(season_start_year)
+        missing_teams = (missing_home or set()).union(
+            missing_away or set(), current_teams
+        )
+        for team in missing_teams:
+            if f"attack_{team}" not in params:
+                # Calculate median values for imputation
+                median_attack = np.median(
+                    [v for k, v in params.items() if k.startswith("attack_")]
+                )
+                median_defence = np.median(
+                    [v for k, v in params.items() if k.startswith("defence_")]
+                )
+
+                # Impute values for missing team
+                params[f"attack_{team}"] = median_attack
+                params[f"defence_{team}"] = median_defence
+                print(f"Imputed parameters for {team} using median values")
+
+        # Store parameters for future use
+        self.previous_params = params.copy()
+
         return params
 
     def simulate_match(
         self, homeTeam: str, awayTeam: str, params: Dict[str, float], max_goals=10
     ):
         """
-        - This function ties the Dixon-Coles prediction model together and returns the match score matrix based on the model parameters
+        Simulate a match between two teams
+
+        Args:
+            homeTeam: Name of the home team
+            awayTeam: Name of the away team
+            params: Dictionary of model parameters
+            max_goals: Maximum number of goals to consider in the score matrix
+
+        Returns:
+            Score probability matrix
         """
+        # Check if parameters exist for both teams
+        if f"attack_{homeTeam}" not in params or f"attack_{awayTeam}" not in params:
+            missing_team = homeTeam if f"attack_{homeTeam}" not in params else awayTeam
+            raise ValueError(f"No parameters available for team: {missing_team}")
 
         def calc_means(param_dict, homeTeam, awayTeam):
             return [
@@ -194,12 +304,19 @@ class DixonColesModel:
                 ),
             ]
 
+        # Calculate expected goals for each team
         team_avgs = calc_means(params, homeTeam, awayTeam)
+
+        # Calculate probability mass functions for goals
         team_pred = [
             [poisson.pmf(i, team_avg) for i in range(0, max_goals + 1)]
             for team_avg in team_avgs
         ]
+
+        # Create score matrix
         output_matrix = np.outer(np.array(team_pred[0]), np.array(team_pred[1]))
+
+        # Apply Dixon-Coles correction for low scores
         correction_matrix = np.array(
             [
                 [

@@ -1,6 +1,9 @@
 import pandas as pd
 from typing import Dict, List
 from constants import DATA_FOLDER
+import numpy as np
+from numpy.typing import NDArray
+from utils import format_season_name
 
 
 class DataRegistry:
@@ -43,11 +46,11 @@ class DataRegistry:
         }
         self.gameweek_data: Dict[str, pd.DataFrame] = {}
         self.player_data: Dict[str, pd.DataFrame] = {}
-        self.load_gameweek_data(gw_data_columns)
+        self._load_gameweek_data(gw_data_columns)
         # Script to clean up the data - player names and starting stats
         # self.standardize_data()
 
-    def load_gameweek_data(self, gw_data_columns: List[str] | None) -> None:
+    def _load_gameweek_data(self, gw_data_columns: List[str] | None) -> None:
         """
         - Use ISO-8859-1 file encoding to load seasonal gameweek and player data into the registry.
         - "gw_data_columns" describes the columns to filter in the merged_gw.csv data files
@@ -125,3 +128,16 @@ class DataRegistry:
             self.gameweek_data[season].to_csv(output_file_path, index=False)
         print("Standardized gameweek data saved to csv!")
         return
+
+    def extract_player_names(self, seasons: List[str]) -> NDArray:
+        """Return list of unique player names from specified 'seasons'"""
+        players = np.array([], dtype=str)
+        for season in seasons:
+            formatted_season_name = format_season_name(season)
+            season_data = self.gameweek_data[formatted_season_name]
+            new_players = season_data[
+                ~season_data["name"].isin(players.tolist())
+            ].name.unique()
+            players = np.concatenate((players, new_players))
+
+        return players

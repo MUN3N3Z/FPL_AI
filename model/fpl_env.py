@@ -1,449 +1,408 @@
 import gymnasium as gym
-import pandas as pd
-from constants import (
-    POSITIONS,
-    NUM_PLAYERS_IN_FPL,
-    GAMEWEEK_COUNT,
-    RANDOM_SEED,
-    TEAM_COUNT_LIMIT,
-    NUM_BENCHED_PLAYERS,
-)
-from utils import position_num_players
+from gymnasium import spaces
 import numpy as np
-from typing import Dict, Any, List, Tuple, DefaultDict
-from collections import defaultdict
-import scipy.stats as stats
-
-# Bayesian Q-learning normal-gamma hyperparameters
-ALPHA = 2.0
-LAMBDA = 1.0
-THETA = 0.1
+import pandas as pd
+from typing import Dict, Tuple, Optional, Any
+from data_registry import DataRegistry
+from utils import format_season_name
+from dixon_coles import DixonColesModel
+from player_ability import PlayerAbility
+from position_minutes import PositionMinutesModel
+from gameweek_simulator import GameweekSimulator
+from team_optimizer import generate_multiple_teams
 
 
 class FPLEnv(gym.Env):
     """
-    - Fantasy Premier League Environment for Reinforcement Learning
-        - state: current_team, budget, gameweek information e.g. unavailable players, player performance predictions
-        - actions: transfer decisions (players to buy/sell)
-        - Reward: points earned after each gameweek
+    Fantasy Premier League Environment for Reinforcement Learning
     """
+
+    metadata = {"render_modes": ["human"]}
 
     def __init__(
         self,
-        player_performance_samples: pd.DataFrame,
-        initial_budget: float = 100.0,
-        max_transfers_per_gw: int = 1,
-        transfer_penalty: int = 4,
+        season_start_year: str,
+        fixtures_data: pd.DataFrame,
+        total_gameweeks: int = 38,
+        current_gameweek: int = 1,
+        budget: float = 100.0,
+        team_size: int = 15,
+        starting_size: int = 11,
+        free_transfers_per_gw: int = 1,
+        max_transfers: int = 2,  # Maximum accumulated free transfers
+        transfer_penalty: int = 4,  # Points deducted for each additional transfer
+        render_mode: Optional[str] = None,
+        **kwargs,
     ):
+        """
+        Initialize the FPL environment
+
+        Args:
+            season_start_year: Starting year of the season (e.g., "2022")
+            fixtures_data: DataFrame containing fixture information for all gameweeks
+            players_ability_data: DataFrame containing player abilities data
+            position_minutes_data: DataFrame with position-specific minutes distribution
+            total_gameweeks: Total number of gameweeks in the season
+            current_gameweek: Starting gameweek
+            budget: Total budget available
+            team_size: Number of players in a team (15 in FPL)
+            starting_size: Number of starting players (11 in FPL)
+            free_transfers_per_gw: Number of free transfers allowed per gameweek
+            max_transfers: Maximum accumulated free transfers
+            transfer_penalty: Points deducted for each additional transfer
+            render_mode: Rendering mode
+        """
         super().__init__()
-        # environment data
-        self._sampled_gameweek_player_performance = player_performance_samples
 
-        # environment parameters
-        self._initial_budget = initial_budget
-        self._max_transfers_per_gw = max_transfers_per_gw
-        self._tranfer_penalty = transfer_penalty
+        self.render_mode = render_mode
+        self.season_start_year = season_start_year
+        self.fixtures_data = fixtures_data
+        self.total_gameweeks = total_gameweeks
+        self.current_gameweek = current_gameweek
+        self.budget = budget
+        self.team_size = team_size
+        self.starting_size = starting_size
+        self.free_transfers_per_gw = free_transfers_per_gw
+        self.max_transfers = max_transfers
+        self.transfer_penalty = transfer_penalty
 
-        # gym.Env variables
-        self._action_subspace_size = 3
-        self.action_space = gym.spaces.Discrete(self._action_subspace_size)
-        self.observation_space = gym.spaces.Dict(
+        # Initialize simulator for getting player points
+        self.gameweek_simulator = GameweekSimulator(season_start_year)
+
+        # Bayesian model for players' abilities
+        self.players_ability_model = PlayerAbility(season_start_year, current_gameweek)
+        # Bayesian model for players' minutes based on their position
+        self.position_minutes_model = PositionMinutesModel()
+        # Initialize available free transfers
+        self.available_transfers = free_transfers_per_gw
+
+        # Initialize team and points
+        self.current_team = None
+        self.current_lineup = None
+        self.captain_id = None
+        self.vice_captain_id = None
+        self.total_points = 0
+        self.gameweek_points = 0
+
+        # Define observation space
+        players_ability_data = self.players_ability_model.player_ability
+        self.observation_space = spaces.Dict(
             {
-                "budget": gym.spaces.Box(low=0, high=initial_budget, shape=(1,)),
-                "team": gym.spaces.MultiDiscrete(
-                    [len(player_performance_samples)] * NUM_PLAYERS_IN_FPL
-                ),
-                "gameweek": gym.spaces.Discrete(GAMEWEEK_COUNT),
-                "player_performance_prediction": gym.spaces.Box(
+                "player_beliefs": spaces.Box(
                     low=0,
-                    high=100,  # Reasonable upperbound for player's points in a single gameweek
+                    high=1,
                     shape=(
-                        len(player_performance_samples),
-                        2,
-                    ),  # Predicted points, cumulative_real_points, (fixture_difficulty?)
+                        len(players_ability_data),
+                        7,
+                    ),  # 7 belief parameters per player
+                    dtype=np.float32,
+                ),
+                "current_team": spaces.MultiBinary(len(players_ability_data)),
+                "current_lineup": spaces.MultiBinary(len(players_ability_data)),
+                "captain": spaces.Discrete(
+                    len(players_ability_data) + 1
+                ),  # +1 for no captain
+                "vice_captain": spaces.Discrete(
+                    len(players_ability_data) + 1
+                ),  # +1 for no vice captain
+                "available_transfers": spaces.Discrete(max_transfers + 1),
+                "current_gameweek": spaces.Discrete(total_gameweeks + 1),
+                "budget": spaces.Box(
+                    low=0, high=float(100), shape=(1,), dtype=np.float32
                 ),
             }
         )
 
-        self.reset(seed=RANDOM_SEED)
+        # Action space (for Bayesian Q-learning, we'll generate actions using MKP)
+        # For the gym interface, we'll define a simple action space that can be mapped to teams
+        # The agent will select from a set of candidate actions
+        self.action_space = spaces.Discrete(3)
 
-    def reset(self, *, seed=None, options=None):
-        """Reset the environment for a new episode"""
-        super().reset(seed=seed, options=options)
-        self._current_gw = 0
-        self._budget = self._initial_budget
-        self._total_points = 0
-        self._free_transfers = 1
+        # Action generation cache
+        self.candidate_actions = []
 
-        self._team = self._initialize_team()
-        self._bench = self._select_bench()
-        self._playing = self._team[~self._team["name"].isin(self._bench["name"])]
-        self._captain = self._select_captain()
-        self._vice_captain = self._select_vice_captain()
+    def reset(
+        self, *, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, Any]]:
+        """
+        Reset the environment to the beginning of a new episode
 
-        self.action_subset = self._initialize_actions()
-        self.q_values = self._initialize_q_values()
+        Args:
+            seed: Random seed
+            options: Additional options for reset
 
+        Returns:
+            observation: Initial observation
+            info: Additional information
+        """
+        # Initialize the RNG
+        super().reset(seed=seed)
+
+        # Reset gameweek and points
+        if options and "gameweek" in options:
+            self.current_gameweek = options["gameweek"]
+        else:
+            self.current_gameweek = 1
+
+        self.total_points = 0
+        self.gameweek_points = 0
+        self.available_transfers = self.free_transfers_per_gw
+
+        # Initialize team using MKP if not provided
+        if options and "initial_team" in options:
+            self.current_team = options["initial_team"]
+            self.current_lineup = options["initial_lineup"]
+            self.captain_id = options["captain"]
+            self.vice_captain_id = options["vice_captain"]
+        else:
+            # Generate player points for the first gameweek
+            fixture_gw = self.fixtures_data[
+                self.fixtures_data["GW"] == self.current_gameweek
+            ]
+            player_points_gw = self._simulate_gameweek_points(fixture_gw)
+
+            # Initialize team using MKP approach
+            teams = generate_multiple_teams(
+                player_df=player_points_gw,
+                num_teams=3,
+                samples_per_team=20,
+                budget=self.budget,
+            )
+
+            if teams:
+                best_team = teams[0]
+                self.current_team = best_team["squad"]
+                self.current_lineup = best_team["lineup"]
+                self.captain_id = best_team["captain"]
+                self.vice_captain_id = best_team["vice_captain"]
+            else:
+                raise ValueError("Could not generate a valid initial team")
+
+        # Get current observation
         observation = self._get_observation()
-        info = {}
+
+        # Additional info
+        info = {
+            "gameweek": self.current_gameweek,
+            "total_points": self.total_points,
+            "available_transfers": self.available_transfers,
+        }
 
         return observation, info
 
     def step(
-        self, action_index: int
-    ) -> Tuple[Dict[str, Any], int, bool, Dict[str, Any]]:
+        self, action: int
+    ) -> Tuple[Dict[str, np.ndarray], float, bool, bool, Dict[str, Any]]:
         """
-        - Perform a state transition in the Markov Decision Problem (MDP) modeling of FPL
-        - action: index into self.action_subset
+        Take a step in the environment by selecting a team for the next gameweek
+
+        Args:
+            action: Index of the candidate team to select (0, 1, or 2)
+
+        Returns:
+            observation: New observation after taking the action
+            reward: Reward obtained from the action
+            terminated: Whether the episode is terminated
+            truncated: Whether the episode is truncated
+            info: Additional information
         """
-        selected_action = self.action_subset[action_index]
-        transfer_cost = 0
-        if selected_action["transfer"]:
-            # Possibility of having no good transfer to make
-            # 1 transfer restriction per step
-            transfer_cost = self._make_transfer(selected_action)
+        if not self.candidate_actions:
+            # Generate candidate actions if none exist
+            self._generate_candidate_actions()
 
-        # Update captain and bench based on predictions
-        self._captain = self._select_captain()
-        self._vice_captain = self._select_vice_captain()
-        self._bench = self._select_bench()
-        self._playing = self._team[~self._team["name"].isin(self._bench["name"])]
+        # Check if action is valid
+        if action < 0 or action >= len(self.candidate_actions):
+            # Invalid action, return a large negative reward
+            reward = -1000
+            observation = self._get_observation()
+            terminated = False
+            truncated = False
+            info = {"error": "Invalid action index"}
+            return observation, reward, terminated, truncated, info
 
-        gw_points = self._calculate_gw_points()
-        adjusted_points = gw_points - transfer_cost
-        self._total_points += adjusted_points
+        # Get selected team
+        selected_team = self.candidate_actions[action]
 
-        self._current_gw += 1
-
-        # Use Bayesian Q-learning and Value of Perfect Information to update action subset
-        self._updateaction_subset(action_index, adjusted_points)
-
-        done = self._current_gw >= GAMEWEEK_COUNT
-        observation = self._get_observation()
-        info = {
-            "team": self._team,
-            "budget": self._budget,
-            "points": self._total_points,
-            "transfers": selected_action["transfer"],
-        }
-
-        return observation, adjusted_points, done, info
-
-    def _initialize_q_values(self) -> DefaultDict[Tuple[str, str], Dict[str, Any]]:
-        """Initialize Bayesian Q-values for the action subset"""
-        q_values = defaultdict(dict)
-        for action in self.action_subset:
-            # action: (sell_player, buy_player)
-            sell_player, buy_player = action["transfer"]
-            sampled_reward = self._sampled_gameweek_player_performance.loc[
-                buy_player, "sampled_points"
+        # Calculate transfers made
+        transfers_made = 0
+        if self.current_team:
+            players_out = [
+                p for p in self.current_team if p not in selected_team["squad"]
             ]
-            M2 = sampled_reward**2  # Second moment
-            q_values[(sell_player, buy_player)] = {
-                "μ": sampled_reward,
-                "λ": LAMBDA,
-                "β": THETA**2 * M2,
-                "α": ALPHA,
-                "vpi": 0.0,  # Value of perfect information
-            }
+            transfers_made = len(players_out)
 
-        return q_values
+        # Calculate transfer penalties
+        transfer_penalty = 0
+        extra_transfers = max(0, transfers_made - self.available_transfers)
+        if extra_transfers > 0:
+            transfer_penalty = extra_transfers * self.transfer_penalty
 
-    def _initialize_team(self) -> pd.DataFrame:
-        """
-        - Select a team of 15 players with the highest sampled points per unit cost in the
-         first gameweek based on FPL's rules:
-            - 2 goalkeepers
-            - 5 defenders
-            - 5 midfielders
-            - 3 forwards
-        - Other constrainst include:
-            - 3 players per Premier league team
-            - budget - 100 million Euros
-        """
-        # Greedily sort players using their expected points per unit cost
-        self._sampled_gameweek_player_performance["value"] = (
-            self._sampled_gameweek_player_performance["sampled_points"]
-            / self._sampled_gameweek_player_performance["price"]
-        )
-        sorted_sampled_gameweek_player_performance = (
-            self._sampled_gameweek_player_performance.sort_values(
-                by="value", ascending=False, inplace=False
+        # Update team
+        self.current_team = selected_team["squad"]
+        self.current_lineup = selected_team["lineup"]
+        self.captain_id = selected_team["captain"]
+        self.vice_captain_id = selected_team["vice_captain"]
+
+        # Move to next gameweek
+        self.current_gameweek += 1
+
+        # Calculate actual points for the team using historical data
+        actual_points = self._calculate_actual_points()
+
+        # Subtract transfer penalty
+        actual_points -= transfer_penalty
+
+        # Update total points
+        self.gameweek_points = actual_points
+        self.total_points += actual_points
+
+        # Update available transfers for next gameweek
+        if transfers_made >= self.available_transfers:
+            # Used all available transfers, reset to 1
+            self.available_transfers = self.free_transfers_per_gw
+        else:
+            # Carry over unused transfer (max 2)
+            self.available_transfers = min(
+                self.max_transfers,
+                self.available_transfers - transfers_made + self.free_transfers_per_gw,
             )
-        )
 
-        team_counts = {team_id: 0 for team_id in range(1, 21)}
-        position_counts = {position: 0 for position in POSITIONS}
-        budget = self._initial_budget
-        sampled_team = []
-        for _, player_row in sorted_sampled_gameweek_player_performance.iterrows():
-            if (
-                player_row["price"] <= budget
-                and position_counts[player_row["position"]]
-                < position_num_players(player_row["position"])
-                and team_counts[player_row["team"]] < TEAM_COUNT_LIMIT
-            ):
-                team_counts[player_row["team"]] += 1
-                position_counts[player_row["position"]] += 1
-                budget -= player_row["price"]
-                sampled_team.append(player_row.copy())
-            if len(sampled_team) == NUM_PLAYERS_IN_FPL:
-                break
+        # Update player ability beliefs based on actual performance
+        self.players_ability_model.update_model()
 
-        sampled_team_df = pd.DataFrame(sampled_team)  # Retain "name" as index
-        return sampled_team_df
+        # Clear candidate actions for next step
+        self.candidate_actions = []
 
-    def _select_bench(self) -> pd.DataFrame:
-        """
-        - Bench 4 players with the lowest expected points while respecting FPL team formation rules:
-            - 1 GK
-            - At least 3 DEF
-            - At least 3 MID
-            - At least 1 FWD
-        """
-        sorted_team_descending = self._team.sort_values(
-            by="sampled_points", ascending=True, inplace=False
-        )
-        benched_positions_count = defaultdict(int)
-        # Bench one GK by default
-        benched_goal_keeper_idx = sorted_team_descending[
-            sorted_team_descending["position"] == "GK"
-        ].sampled_points.idxmax()
-        bench = [sorted_team_descending.loc[benched_goal_keeper_idx]]
-        sorted_team_descending = sorted_team_descending.drop(benched_goal_keeper_idx)
-        for _, player_row in sorted_team_descending.iterrows():
-            if len(bench) == NUM_BENCHED_PLAYERS:
-                break
-            else:
-                if benched_positions_count[player_row["position"]] < 2:
-                    # Every position, apart from that of the GK allows a max of 2 players from that position to be benched\
-                    bench.append(player_row.copy())
-                    benched_positions_count[player_row["position"]] += 1
+        # Check if season is complete
+        done = self.current_gameweek > self.total_gameweeks
 
-        benched_players = pd.DataFrame(bench)
-        return benched_players
+        # Get new observation
+        observation = self._get_observation()
 
-    def _get_observation(self) -> Dict[str, Any]:
-        """Return current state of the observation state"""
-        return {
-            "budget": self._budget,
-            "team": self._team,
-            "player_performance_prediction": self._sampled_gameweek_player_performance.filter(
-                ["name", "team", "sampled_points"]
-            ),
+        # Prepare info dictionary
+        info = {
+            "gameweek": self.current_gameweek,
+            "gameweek_points": self.gameweek_points,
+            "total_points": self.total_points,
+            "transfers_made": transfers_made,
+            "transfer_penalty": transfer_penalty,
+            "available_transfers": self.available_transfers,
         }
 
-    def _make_transfer(self, action: Tuple[str, str]) -> None:
+        return observation, actual_points, done, False, info
+
+    def _get_observation(self) -> Dict[str, np.ndarray]:
         """
-        - Replace players stipulated in actions["transfer"]
-        - See shape of actions in self._initialize_actions()
-        - The action must be feasible before calling self._make_transfer()
-        - Return: The cost of making the transfer
+        Construct the observation from the current state
+
+        Returns:
+            observation: Dictionary containing observation data
         """
-        sell_player_name, buy_player_name = action["transfer"]
+        # Construct the observation dictionary
+        return {
+            "current_team": self.current_team,
+            "current_lineup": self.current_lineup,
+            "captain": self.captain_id,
+            "vice_captain": self.vice_captain_id,
+            "available_transfers": self.available_transfers,
+            "current_gameweek": self.current_gameweek,
+            "budget": np.array([self.budget], dtype=np.float32),
+        }
 
-        self._team = self._team.drop(index=sell_player_name)
+    def _simulate_gameweek_points(self, fixtures_gw: pd.DataFrame) -> pd.DataFrame:
+        """
+        Simulate player points for a gameweek
 
-        self._team = pd.concat(
-            [
-                self._team,
-                self._sampled_gameweek_player_performance.loc[[buy_player_name]],
-            ],
+        Args:
+            fixtures_gw: DataFrame containing fixtures for the gameweek
+
+        Returns:
+            player_points: DataFrame with simulated points for each player
+        """
+        # Use GameweekSimulator to get points
+        player_points = self.gameweek_simulator.simulate_gameweek(
+            gameweek=str(self.current_gameweek),
+            fixtures_df=fixtures_gw,
+            position_minutes_df=self.position_minutes_model.model_df,
+            players_ability_df=self.players_ability_model.player_ability,
         )
 
-        self._budget += self._sampled_gameweek_player_performance.loc[
-            sell_player_name, "price"
-        ]
-        self._budget -= self._sampled_gameweek_player_performance.loc[
-            buy_player_name, "price"
-        ]
+        return player_points
 
-        transfer_cost = self._tranfer_penalty if self._free_transfers == 0 else 0
-        self._free_transfers = max(self._free_transfers - 1, 0)
+    def _calculate_actual_points(self) -> int:
+        """
+        Calculate the actual points scored by the team for the current gameweek
+        using the real historical data
 
-        return transfer_cost
-
-    def _select_captain(self):
-        """Select player with highest expected points as captain"""
-        return self._team["sampled_points"].idxmax()
-
-    def _select_vice_captain(self):
-        """Select player with second highest expected points as vice captain"""
-        team_without_captain = self._team.drop(index=self._captain, inplace=False)
-        vice_captain = team_without_captain["sampled_points"].idxmax()
-
-        return vice_captain
-
-    def _initialize_actions(self) -> List[Dict[str, Any]]:
-        """Generate promising actions for the current game state"""
-        actions = [
-            {
-                "transfer": self._generate_transfer(),
-                "captain": None,  # Determined dynamically
-                "vice_captain": None,  # Determined dynamically
-                "bench": None,  # Determined dynamically
-            }
-            for _ in range(self._action_subspace_size)
-        ]
-
-        return actions
-
-    def _generate_transfer(self) -> Tuple[str, str]:
-        """Generate a new promising transfer based on scores per unit price"""
-        unselected_players = self._sampled_gameweek_player_performance[
-            ~self._sampled_gameweek_player_performance["name"].isin(self._team["name"])
-        ]
-        unselected_players.loc[:, "value"] = (
-            unselected_players["cumulative_real_points"] / unselected_players["price"]
-        )
-        unselected_players = unselected_players.sort_values(by="value", ascending=False)
-
-        team_with_player_value = self._team.copy()
-        team_with_player_value["value"] = (
-            team_with_player_value["cumulative_real_points"]
-            / team_with_player_value["price"]
-        )
-        # Drop Goalkeepers - naturally have lower points/cost
-        team_with_player_value = team_with_player_value[
-            team_with_player_value["position"] != "GK"
-        ]
-        weakest_player = team_with_player_value.sort_values(
-            by="value", inplace=False, ascending=True
-        ).iloc[0]
-        for _, player_row in unselected_players.iterrows():
-            if (
-                player_row["position"] == weakest_player["position"]
-                and player_row["price"] <= weakest_player["price"]
+        Returns:
+            points: Total points scored by the team
+        """
+        # Add points for the rest of the starting lineup
+        player_abilities = self.players_ability_model.player_ability
+        total_points = 0
+        for player_name in self.current_lineup:
+            player_points = player_abilities.loc[player_name, "real_points"]
+            # Skip captain if we've already counted them
+            if player_name == self.captain_id or (
+                not self.captain_id and player_name == self.vice_captain_id
             ):
-                # (sell_player, buy_player)
-                return weakest_player["name"], player_row["name"]
+                total_points += player_points * 2
+            else:
+                total_points += player_points
+        print(f"Actual team points: {total_points}")
+        return total_points
 
-        return None
+    def _generate_candidate_actions(self) -> None:
+        """
+        Generate candidate team selections using MKP approach
 
-    def _calculate_gw_points(self) -> int:
-        """Sum sampled points for self._playing and double captain's points according to FPL rules"""
-        return (
-            self._playing["sampled_points"].sum()
-            + self._playing.loc[self._captain, "sampled_points"]
+        """
+        # Get fixtures for the next gameweek
+        next_gameweek = self.current_gameweek
+        fixtures_gw = self.fixtures_data[self.fixtures_data["GW"] == next_gameweek]
+
+        # Simulate player points for the next gameweek
+        player_points_df = self._simulate_gameweek_points(fixtures_gw)
+
+        # Generate multiple teams using MKP
+        teams = generate_multiple_teams(
+            player_df=player_points_df,
+            num_teams=3,
+            samples_per_team=20,
+            budget=self.budget,
+            current_team=self.current_team,
+            free_transfers=self.available_transfers,
         )
 
-    def _update_q_value(self, action_index: int, reward: int) -> None:
+        # Store the candidate actions
+        self.candidate_actions = teams
+
+    def render(self) -> None:
         """
-        - Update the Bayesian Q-value associated with the action index using
-        normal-gamma moment updating
+        Render the current state of the environment
         """
-        action = self.action_subset[action_index]["transfer"]
-        λ = self.q_values[action]["λ"]
-        μ = self.q_values[action]["μ"]
-        β = self.q_values[action]["β"]
+        if self.render_mode == "human":
+            print(f"\nGameweek: {self.current_gameweek}")
+            print(f"Total Points: {self.total_points}")
+            print(f"Last Gameweek Points: {self.gameweek_points}")
+            print(f"Available Transfers: {self.available_transfers}")
 
-        self.q_values[action]["λ"] += 1
-        self.q_values[action]["α"] += 0.5
-        # Update μ and β using moment updating
-        self.q_values[action]["μ"] = ((λ * μ) + reward) / self.q_values[action]["λ"]
-        self.q_values[action]["β"] += (0.5 * λ * (reward - μ) ** 2) / self.q_values[
-            action
-        ]["λ"]
-
-        return None
-
-    def _calculate_vpi(self, action: Tuple[str, str]) -> float:
-        """
-        - Calculate the Value of Perfect Information for an action
-        - Action: (sell_player_name, buy_player_name)
-        """
-        best_action = max(self.q_values, key=lambda action: self.q_values[action]["μ"])
-        best_q_value = self.q_values[best_action]["μ"]
-        second_best_q_value = max(
-            [
-                self.q_values[action]["μ"]
-                for action in self.q_values.keys()
-                if action != best_action
-            ],
-            default=0,
-        )
-        # Parameters for t-distribution
-        ν = 2 * self.q_values[action]["α"]
-        σ = np.sqrt(
-            self.q_values[action]["β"]
-            * (1 + 1 / self.q_values[action]["λ"])
-            / self.q_values[action]["α"]
-        )
-
-        # Get the mean for this action
-        μ = self.q_values[action]["μ"]
-        # Calculate VPI
-        t_distribution = stats.t(df=ν, loc=0, scale=1)  # Standard t-distribution
-        if action == best_action:
-            #  For the best action, learning only helps if its true value turns out worse than estimate
-            #  of second-best action
-            threshold = (second_best_q_value - μ) / σ
-            vpi = σ * t_distribution.pdf(
-                threshold * (1 - t_distribution.cdf(threshold))
-                + t_distribution.pdf(threshold)
-            )
-        else:
-            # Other actions' vpi only matter is their true value turns out to be better than estimated
-            # value of best action
-            threshold = (best_q_value - μ) / σ
-            vpi = σ * (
-                threshold * t_distribution.cdf(threshold)
-                + t_distribution.pdf(threshold)
-            )
-            # Invert since we're using standardized t-distribution
-            vpi = -vpi
-        # VPi should be non-negative
-        return max(0, vpi)
-
-    def _updateaction_subset(self, selected_action_index: int, reward):
-        """
-        - Update the action subset in place based on Bayesian Q-learning, replacing low-value actions with new, promising ones
-        using the Value of Perfect Information (VPI) approach
-        """
-        self._update_q_value(selected_action_index, reward)
-
-        # Calculate VPI for all actions
-        for action_index in range(self._action_subspace_size):
-            action = self.action_subset[action_index]["transfer"]
-            self.q_values[action]["vpi"] = self._calculate_vpi(action)
-
-        best_action = max(self.q_values, key=lambda action: self.q_values[action]["μ"])
-        best_q_value = self.q_values[best_action]["μ"]
-
-        #  Replace actions where q_hat + VPI < best_q with new actions
-        for action, q_value_dict in self.q_values.items():
-            if action != best_action:
-                q_hat_vpi = q_value_dict["μ"] + q_value_dict["vpi"]
-                if q_hat_vpi < best_q_value:
-                    #  Replace this action
-                    new_action = self._generate_transfer()
-                    old_action_index = next(
-                        (
-                            index
-                            for index, action_dict in enumerate(self.action_subset)
-                            if action_dict["transfer"] == action
-                        ),
-                        None,
-                    )
-                    self.action_subset[old_action_index] = {
-                        "transfer": new_action,
-                        "captain": None,  # Determined dynamically
-                        "vice_captain": None,  # Determined dynamically
-                        "bench": None,  # Determined dynamically
-                    }
-
-                    _, buy_player = new_action
-                    sampled_reward = self._sampled_gameweek_player_performance.loc[
-                        buy_player, "sampled_points"
+            if self.current_team:
+                print("\nCurrent Team:")
+                for player_name in self.current_team:
+                    player_data = self.players_ability_data[
+                        self.players_ability_data["name"] == player_name
                     ]
-                    M2 = sampled_reward**2  # Second moment
-                    self.q_values[new_action] = {
-                        "μ": sampled_reward,
-                        "λ": LAMBDA,
-                        "β": THETA**2 * M2,
-                        "α": ALPHA,
-                        "vpi": 0.0,
-                    }
-                    self.q_values.pop(action)
-
-        return None
+                    captain_mark = (
+                        " (C)"
+                        if player_name == self.captain_id
+                        else " (V)"
+                        if player_name == self.vice_captain_id
+                        else ""
+                    )
+                    lineup_mark = (
+                        " (Starting)"
+                        if player_name in self.current_lineup
+                        else " (Bench)"
+                    )
+                    print(f"  {player_name}{captain_mark}{lineup_mark}")

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from data_registry import DataRegistry
-from utils import team_to_id_converter_2023_24, format_season_name
+from utils import team_to_id_converter, format_season_name
 
 
 class PlayerAbility:
@@ -70,13 +70,15 @@ class PlayerAbility:
         # Priors obtained from https://cdn.aaai.org/ojs/8259/8259-13-11787-1-2-20201228.pdf
         player_priors = {
             player_row["name"]: {
-                "team": team_to_id_converter_2023_24(player_row["team"]),
+                "team": team_to_id_converter(self._season, player_row["team"]),
                 "position": player_row["position"],
                 "ρ_β": np.array([0.25, 0.25, 0.5]),
                 "ω_α": 0.0,
                 "ω_β": 5.0,
                 "ψ_α": 0.0,
                 "ψ_β": 5.0,
+                "price": 0,
+                "real_points": 0,
             }
             for _, player_row in current_season_players.iterrows()
         }
@@ -120,10 +122,14 @@ class PlayerAbility:
             player_priors[player_name]["ψ_α"] += ψ_observed
             player_priors[player_name]["ψ_β"] += total_gameweeks_played - ψ_observed
 
+            player_priors[player_name]["price"] = player_data.iloc[0]["value"] / 10
+            player_priors[player_name]["real_points"] = player_data.iloc[0][
+                "total_points"
+            ]
+
         # Save player_ability_df as a csv file
         player_ability_df = pd.DataFrame(player_priors)
-        player_ability_df = player_ability_df.T.reset_index()
-        player_ability_df.rename(columns={"index": "name"}, inplace=True)
+        player_ability_df = player_ability_df.T
 
         return player_ability_df
 
@@ -131,27 +137,60 @@ class PlayerAbility:
         """Updates self.player_ability with data from the next gameweek (self._gameweek + 1)"""
         self._gameweek += 1
         current_season_data = self._seasonal_gameweek_player_data.gameweek_data[
-            self._season
+            format_season_name(self._season)
         ]
         current_gameweek_data = current_season_data[
             current_season_data["GW"] == self._gameweek
         ]
-        current_gameweek_data.index = current_gameweek_data["name"]
-        for _, player_row in self.player_ability.iterrows():
-            self.player_ability.loc[player_row["name"], "ρ_β"] += (
-                [1, 0, 0]
-                if player_row["starts"] == 1
-                else [0, 1, 0]
-                if player_row["minutes"] > 0
-                else [0, 0, 1]
-            )
-            # Beta prior update for ω
-            ω_observed = current_gameweek_data.loc[player_row["name"], "goals_scored"]
-            self.player_ability[player_row["name"], "ω_α"] += ω_observed
-            self.player_ability[player_row["name"], "ω_β"] += 1 - ω_observed
-            # Beta prior update for ψ
-            ψ_observed = current_gameweek_data.loc[player_row["name"], "assists"]
-            self.player_ability[player_row["name"], "ψ_α"] += ψ_observed
-            self.player_ability[player_row["name"], "ψ_β"] += 1 - ψ_observed
+        for player_name, player_row in current_gameweek_data.iterrows():
+            if player_name in self.player_ability.index:
+                # Pre-existing player in player_ability dataframe
+                self.player_ability.at[player_name, "ρ_β"] = np.array(
+                    self.player_ability.loc[player_name, "ρ_β"]
+                ) + np.array(
+                    [1, 0, 0]
+                    if player_row["starts"] == 1
+                    else [0, 1, 0]
+                    if player_row["minutes"] > 0
+                    else [0, 0, 1]
+                )
+                # Beta prior update for ω
+                ω_observed = player_row["goals_scored"]
+                self.player_ability.loc[player_name, "ω_α"] += ω_observed
+                self.player_ability.loc[player_name, "ω_β"] += 1 - ω_observed
+                # Beta prior update for ψ
+                ψ_observed = player_row["assists"]
+                self.player_ability.loc[player_name, "ψ_α"] += ψ_observed
+                self.player_ability.loc[player_name, "ψ_β"] += 1 - ψ_observed
+                # Price
+                self.player_ability.loc[player_name, "price"] = player_row["value"] / 10
+                # Gameweek points
+                self.player_ability.loc[player_name, "real_points"] = player_row[
+                    "total_points"
+                ]
+            else:
+                # Create new row for new player
+                new_player_data = {
+                    "name": player_name,
+                    "position": player_row["position"],
+                    "team": player_row["team"],
+                    "ρ_β": np.array(
+                        [1, 0, 0]
+                        if player_row["starts"] == 1
+                        else [0, 1, 0]
+                        if player_row["minutes"] > 0
+                        else [0, 0, 1]
+                    ),
+                    "ω_α": player_row["goals_scored"],
+                    "ω_β": 1 - player_row["goals_scored"],
+                    "ψ_α": player_row["assists"],
+                    "ψ_β": 1 - player_row["assists"],
+                    "price": player_row["value"] / 10,
+                    "real_points": player_row["total_points"],
+                }
+                new_player_series = pd.Series(new_player_data, name=player_name)
+                self.player_ability = pd.concat(
+                    [self.player_ability, new_player_series.to_frame().T]
+                )
 
         return

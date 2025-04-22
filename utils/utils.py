@@ -4,6 +4,9 @@ import random
 import pandas as pd
 from typing import Dict, Tuple
 from constants import RANDOM_SEED, POSITIONS
+import logging
+import os
+from datetime import datetime
 
 TEAM_ID_MAP_2023_24 = {
     "Arsenal": 1,
@@ -177,3 +180,36 @@ def choose_formation(season_start_year: str, team_id: int) -> Dict[str, int]:
         "1-" + formation_map[(id_to_team_converter(season_start_year, team_id))]
     ).split("-")
     return {position: int(count) for position, count in zip(POSITIONS, formation)}
+
+
+def setup_logging(log_level=logging.INFO, log_dir="logs", app_name="fpl_ai"):
+    # Create log directory if it doesn't exist
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    # Format: timestamp - level - module - message
+    log_format = "%(asctime)s - %(levelname)s - %(module)s - %(message)s"
+
+    # Create timestamp for log filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = os.path.join(log_dir, f"{app_name}_{timestamp}.log")
+
+    # Configure root logger
+    logging.basicConfig(
+        level=log_level,
+        format=log_format,
+        handlers=[
+            # File handler with all logs
+            logging.FileHandler(log_file),
+            # Console handler with info and higher
+            logging.StreamHandler(),
+        ],
+    )
+
+    # Return logger for the calling module
+    return logging.getLogger()
+
+
+def get_logger(name):
+    """Get a logger for a specific module/component"""
+    return logging.getLogger(name)

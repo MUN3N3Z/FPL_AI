@@ -3,13 +3,13 @@ from gymnasium import spaces
 import numpy as np
 import pandas as pd
 from typing import Dict, Tuple, Optional, Any
-from data_registry import DataRegistry
-from utils import format_season_name
-from dixon_coles import DixonColesModel
 from player_ability import PlayerAbility
 from position_minutes import PositionMinutesModel
 from gameweek_simulator import GameweekSimulator
 from team_optimizer import generate_multiple_teams
+from utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class FPLEnv(gym.Env):
@@ -349,7 +349,6 @@ class FPLEnv(gym.Env):
                 total_points += player_points * 2
             else:
                 total_points += player_points
-        print(f"Actual team points: {total_points}")
         return total_points
 
     def _generate_candidate_actions(self) -> None:
@@ -382,13 +381,13 @@ class FPLEnv(gym.Env):
         Render the current state of the environment
         """
         if self.render_mode == "human":
-            print(f"\nGameweek: {self.current_gameweek}")
-            print(f"Total Points: {self.total_points}")
-            print(f"Last Gameweek Points: {self.gameweek_points}")
-            print(f"Available Transfers: {self.available_transfers}")
+            logger.info(f"\nGameweek: {self.current_gameweek}")
+            logger.info(f"Total Points: {self.total_points}")
+            logger.info(f"Last Gameweek Points: {self.gameweek_points}")
+            logger.info(f"Available Transfers: {self.available_transfers}")
 
             if self.current_team:
-                print("\nCurrent Team:")
+                logger.info("\nCurrent Team:")
                 for player_name in self.current_team:
                     player_data = self.players_ability_data[
                         self.players_ability_data["name"] == player_name
@@ -405,4 +404,4 @@ class FPLEnv(gym.Env):
                         if player_name in self.current_lineup
                         else " (Bench)"
                     )
-                    print(f"  {player_name}{captain_mark}{lineup_mark}")
+                    logger.info(f"  {player_name}{captain_mark}{lineup_mark}")

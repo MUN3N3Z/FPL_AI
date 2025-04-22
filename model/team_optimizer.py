@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import pulp
 from typing import Dict, Any
+from utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def generate_fpl_team(
@@ -250,7 +253,7 @@ def generate_fpl_team(
 
     # Check if solution was found
     if model.status != pulp.LpStatusOptimal:
-        print("No solution found!")
+        logger.info("No solution found!")
         return None
 
     # Extract results
@@ -396,25 +399,25 @@ def generate_multiple_teams(
 
 def display_team(team: Dict[str, Any], player_df: pd.DataFrame):
     """Display the selected team in a readable format"""
-    print("\n==== SELECTED TEAM ====")
-    print(f"Expected Points: {team['expected_points']:.2f}")
-    print(f"Team Cost: £{team['team_cost']:.1f}m")
+    logger.info("\n==== SELECTED TEAM ====")
+    logger.info(f"Expected Points: {team['expected_points']:.2f}")
+    logger.info(f"Team Cost: £{team['team_cost']:.1f}m")
 
     if "transfers" in team:
-        print(f"Transfers Made: {team['transfers']}")
+        logger.info(f"Transfers Made: {team['transfers']}")
         if team["transfer_penalty"] > 0:
-            print(f"Transfer Penalty: {team['transfer_penalty']} points")
+            logger.info(f"Transfer Penalty: {team['transfer_penalty']} points")
 
-    print("\n--- Starting Lineup ---")
-    print("Captain: " + team["captain"])
-    print("Vice Captain: " + team["vice_captain"])
+    logger.info("\n--- Starting Lineup ---")
+    logger.info("Captain: " + team["captain"])
+    logger.info("Vice Captain: " + team["vice_captain"])
 
     positions = ["GK", "DEF", "MID", "FWD"]
     for pos in positions:
         pos_players = player_df[
             (player_df.index.isin(team["lineup"])) & (player_df["position"] == pos)
         ]
-        print(f"\n{pos}:")
+        logger.info(f"\n{pos}:")
         for player_name, player in pos_players.iterrows():
             captain_mark = (
                 " (C)"
@@ -423,25 +426,25 @@ def display_team(team: Dict[str, Any], player_df: pd.DataFrame):
                 if player_name == team["vice_captain"]
                 else ""
             )
-            print(
+            logger.info(
                 f"  {player_name} - {player['team']} - £{player['price']}m - {player['sampled_points']:.2f}pts{captain_mark}"
             )
 
-    print("\n--- Bench ---")
+    logger.info("\n--- Bench ---")
     for player_id in team["bench"]:
         player = player_df.loc[player_id].iloc[0]
-        print(
+        logger.info(
             f"  {player_id} - {player['position']} - {player['team']} - £{player['price']}m - {player['sampled_points']:.2f}pts"
         )
 
     if "players_in" in team and team["players_in"]:
-        print("\n--- Transfers In ---")
+        logger.info("\n--- Transfers In ---")
         for player_id in team["players_in"]:
             player = player_df.loc[player_id].iloc[0]
-            print(f"  {player_id} - {player['position']} - {player['team']}")
+            logger.info(f"  {player_id} - {player['position']} - {player['team']}")
 
     if "players_out" in team and team["players_out"]:
-        print("\n--- Transfers Out ---")
+        logger.info("\n--- Transfers Out ---")
         for player_id in team["players_out"]:
             player = player_df.loc[player_id].iloc[0]
-            print(f"  {player_id} - {player['position']} - {player['team']}")
+            logger.info(f"  {player_id} - {player['position']} - {player['team']}")

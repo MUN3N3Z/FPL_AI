@@ -1,10 +1,12 @@
-import numpy as np
-import pandas as pd
 from typing import Dict, List, Tuple, Any
 import math
 from scipy.stats import norm
 from collections import defaultdict
 from fpl_env import FPLEnv
+from utils import get_logger
+
+# Module logger
+logger = get_logger(__name__)
 
 
 class BayesianQLearningAgent:
@@ -269,7 +271,7 @@ class BayesianQLearningAgent:
             self.episode_rewards.append(total_reward)
             self.cumulative_reward += total_reward
 
-            print(
+            logger.info(
                 f"Episode {episode+1}/{num_episodes} - Total points: {total_reward} - Cumulative points: {self.cumulative_reward}"
             )
 
@@ -365,11 +367,6 @@ class BayesianQLearningAgent:
 
         Only replace an action when its expected value plus VPI is less than the best action's expected value.
 
-        Args:
-            state_key: Hashed state representation
-            action_idx: Index of the action to evaluate
-            best_action_idx: Index of the action with highest Q-value mean
-
         """
         if action_idx == best_action_idx:
             return False
@@ -393,9 +390,6 @@ class BayesianQLearningAgent:
     def evaluate(self, env: FPLEnv) -> Tuple[float, List[Dict]]:
         """
         Evaluate the trained agent on a season
-
-        Args:
-            env: FPL environment
 
         Returns:
             total_points: Total points scored
@@ -442,7 +436,7 @@ class BayesianQLearningAgent:
             state = next_state
             total_points += reward
 
-            print(
+            logger.info(
                 f"Gameweek {info['gameweek']-1} - Points: {reward} - Total: {total_points}"
             )
 

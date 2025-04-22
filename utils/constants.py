@@ -26,6 +26,3 @@ TARGET_ACCEPT: float = 0.9
 
 # Project file paths
 DATA_FOLDER: str = "../data"
-PLAYER_ABILITY_FILE: str = "player_ability.csv"
-POSITION_MINUTES_FILE: str = "player_position_minutes.csv"
-FIXTURE_FILE: str = "fixtures.csv"

@@ -12,6 +12,9 @@ from constants import (
     PROMOTED_TEAMS_2022_23,
     RELEGATED_TEAMS_2022_23,
 )
+from utils import get_logger
+
+logger = get_logger(__name__)
 
 # A Premier League season has 380 fixtures; 20 teams
 GAMES_PER_GAMEWEEK = 10
@@ -49,7 +52,7 @@ class DixonColesModel:
                     ["python3", relative_path, season_start_year], check=True
                 )
             except subprocess.SubprocessError as e:
-                print(
+                logger.critical(
                     f"An error occurred while running the script -> {absolute_path}: {e}"
                 )
         try:
@@ -105,10 +108,10 @@ class DixonColesModel:
         all_prev_teams = set(prev_season_df["HomeTeam"].unique())
 
         # Determine promoted and relegated teams for this season
-        if season_start_year == "2022":
+        if season_start_year == "2023":
             promoted_teams = set(PROMOTED_TEAMS_2022_23)
             relegated_teams = set(RELEGATED_TEAMS_2022_23)
-        elif season_start_year == "2021":
+        elif season_start_year == "2022":
             promoted_teams = set(PROMOTED_TEAMS_2021_22)
             relegated_teams = set(RELEGATED_TEAMS_2021_22)
         else:
@@ -165,7 +168,7 @@ class DixonColesModel:
                 )
             except FileNotFoundError:
                 # If current season data not available, use filtered previous season data
-                print(
+                logger.critical(
                     f"Warning: No data found for season {season_start_year}. Using only previous season data."
                 )
                 fixture_results_df = prev_season_results_df
@@ -182,9 +185,9 @@ class DixonColesModel:
         if not np.array_equal(teams, away_teams):
             missing_home = set(away_teams) - set(teams)
             missing_away = set(teams) - set(away_teams)
-            print(f"Warning: Home and away team sets differ.")
-            print(f"Teams in away but not home: {missing_home}")
-            print(f"Teams in home but not away: {missing_away}")
+            logger.warning(f"Warning: Home and away team sets differ.")
+            logger.warning(f"Teams in away but not home: {missing_home}")
+            logger.warning(f"Teams in home but not away: {missing_away}")
 
             # Filter to common teams to ensure consistent parameters
             common_teams = set(teams).intersection(set(away_teams))
@@ -195,8 +198,8 @@ class DixonColesModel:
             teams = np.sort(list(common_teams))
 
         n_teams = len(teams)
-        print(f"Fitting model with {n_teams} teams:")
-        print(", ".join(teams))
+        logger.info(f"Fitting model with {n_teams} teams:")
+        logger.info(", ".join(teams))
 
         # Random initialization of model parameters
         init_vals = np.concatenate(
@@ -249,9 +252,7 @@ class DixonColesModel:
 
         # Add parameters for missing teams if needed
         current_teams = self._get_current_season_teams(season_start_year)
-        missing_teams = (missing_home or set()).union(
-            missing_away or set(), current_teams
-        )
+        missing_teams = current_teams - set(teams)
         for team in missing_teams:
             if f"attack_{team}" not in params:
                 # Calculate median values for imputation
@@ -265,7 +266,7 @@ class DixonColesModel:
                 # Impute values for missing team
                 params[f"attack_{team}"] = median_attack
                 params[f"defence_{team}"] = median_defence
-                print(f"Imputed parameters for {team} using median values")
+                logger.warning(f"Imputed parameters for {team} using median values")
 
         # Store parameters for future use
         self.previous_params = params.copy()

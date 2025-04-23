@@ -171,4 +171,5 @@ cython_debug/
 .pypirc
 
 # pickled files
-.pkl
+*.pkl
+*.pickle

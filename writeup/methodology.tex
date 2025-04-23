@@ -1,5 +1,11 @@
 \section{Introduction to Methodology}
-My methodological apprach in this project can be divided into three: modeling beliefs on players' abilities in a Bayesian manner, modeling FPL's team selection process as a Belief-State Markov Decision Process (BSMDP), and solving the MDP using Bayesian Q-learning. This methodology is similar to the one described in the paper - Competing with Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains \cite{matthews2012}. I have, however, made my own adjustments to this methodology in ways that I believe improved my model.
+My methodological approach in this project can be divided into three: 
+\begin{itemize}
+    \item modeling beliefs on players' abilities in a Bayesian manner
+    \item modeling FPL's team selection process as a Belief-State Markov Decision Process (BSMDP)
+    \item solving the MDP using Bayesian Q-learning
+\end{itemize}
+This methodology is similar to the one described in the paper - Competing with Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains \cite{matthews2012} but with a few alterations
 
 \section{Modeling players' abilities}
 Modeling a player's ability in a manner that captured the uncertainity of their performance in games was important in this project. As such, I took a Bayesian apprach to model this belief by maintaining a distribution over possible performance levels. Furthermore, a Bayesian model allowed me to incorporate domain knowledge through priors using performance data from previous seasons. This was crucial in giving good players a higher baseline even when they experience a slump in their performance. The players' abilities I sought to model are the probabilities of a player: 

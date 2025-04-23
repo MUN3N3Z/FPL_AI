@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import pulp
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from utils import get_logger
 
 logger = get_logger(__name__)
@@ -40,6 +40,33 @@ def generate_fpl_team(
     dict
         Dictionary containing selected team information
     """
+    # First, handle the case where players in current_team are not in player_df
+    if current_team is not None:
+        # Check if all current team players are in the dataframe
+        missing_players = [p for p in current_team if p not in player_df.index]
+
+        if missing_players:
+            logger.warning(
+                f"The following players from your current team are not in the available players: {missing_players}"
+            )
+
+            # Filter out missing players from current_team
+            current_team = [p for p in current_team if p in player_df.index]
+
+            # If too many players are missing, free transfer might be unrealistic
+            if len(missing_players) > free_transfers:
+                logger.warning(
+                    f"More players missing ({len(missing_players)}) than free transfers available ({free_transfers}). "
+                    f"Will proceed with the available players, but expect transfer penalties."
+                )
+
+    # If no valid current team players remain, treat as a new team
+    if current_team is not None and len(current_team) == 0:
+        logger.warning(
+            "No valid players remain in current team. Treating as a new team selection."
+        )
+        current_team = None
+    # Enforce unique players
     player_df = player_df.sort_values(by="sampled_points", ascending=False)
     player_df = (
         player_df.reset_index().drop_duplicates(subset=["index"]).set_index("index")
@@ -253,8 +280,23 @@ def generate_fpl_team(
 
     # Check if solution was found
     if model.status != pulp.LpStatusOptimal:
-        logger.info("No solution found!")
-        return None
+        logger.warning(
+            "No optimal solution found. Attempting to solve with relaxed constraints."
+        )
+
+        # Try again with relaxed constraints if we have a current team
+        if current_team is not None:
+            # Start fresh
+            return generate_fpl_team(
+                player_df=player_df,
+                budget=budget,
+                current_team=None,  # Treat as a new team
+                free_transfers=free_transfers,
+                team_value=team_value,
+            )
+        else:
+            logger.error("Failed to find a solution even with relaxed constraints.")
+            return None
 
     # Extract results
     selected_players = [
@@ -301,6 +343,10 @@ def generate_fpl_team(
         extra_transfers_made = int(pulp.value(extra_transfers))
         transfer_penalty = 4 * extra_transfers_made
         expected_points -= transfer_penalty
+    else:
+        transfers_made = 0
+        extra_transfers_made = 0
+        transfer_penalty = 0
 
     # Identify best captain (highest expected points)
     captain_id = (
@@ -327,8 +373,23 @@ def generate_fpl_team(
     if current_team is not None:
         result["transfers"] = transfers_made
         result["transfer_penalty"] = transfer_penalty
-        result["players_in"] = [p for p in selected_players if p not in current_team]
-        result["players_out"] = [p for p in current_team if p not in selected_players]
+        players_in = [p for p in selected_players if p not in current_team]
+        players_out = [p for p in current_team if p not in selected_players]
+
+        # Handle the case where initial team had missing players by adding them to players_out
+        missing_players_out = (
+            [p for p in missing_players if p not in players_out]
+            if "missing_players" in locals()
+            else []
+        )
+        if missing_players_out:
+            logger.info(
+                f"Adding missing players to the 'players_out' list: {missing_players_out}"
+            )
+            players_out.extend(missing_players_out)
+
+        result["players_in"] = players_in
+        result["players_out"] = players_out
 
     return result
 
@@ -340,7 +401,7 @@ def generate_multiple_teams(
     budget=100.0,
     current_team=None,
     free_transfers=1,
-):
+) -> List[Dict[str, Any]]:
     """
     Generate multiple candidate teams
 
@@ -366,40 +427,123 @@ def generate_multiple_teams(
     """
     teams = []
 
-    for i in range(num_teams):
-        # For each team, resample the expected points
-        # This introduces variability as suggested in the paper
-        if samples_per_team > 1:
-            # Resample points based on uncertainty in player performance
-            # This is a simplified version - in reality, you'd use your Bayesian model
-            sampled_df = player_df.copy()
-            # Add noise to expected points to simulate different sampling outcomes
-            noise = np.random.normal(0, 0.5, len(sampled_df))
-            sampled_df["sampled_points"] = sampled_df["sampled_points"] + noise
-            # Ensure no negative expected points
-            sampled_df["sampled_points"] = sampled_df["sampled_points"].clip(lower=0)
-        else:
-            sampled_df = player_df
+    # Safety check for current_team - make sure it's a list if provided
+    if current_team is not None and not isinstance(current_team, list):
+        try:
+            current_team = list(current_team)
+        except Exception as e:
+            logger.warning(
+                f"Failed to convert current_team to list: {e}. Treating as a new team selection."
+            )
+            current_team = None
 
-        # Generate team with this sample
-        team = generate_fpl_team(
-            sampled_df,
-            budget=budget,
-            current_team=current_team,
-            free_transfers=free_transfers,
+    # First attempt: try with current team
+    attempts_with_current = 0
+    max_attempts_with_current = 3
+
+    while attempts_with_current < max_attempts_with_current and len(teams) < num_teams:
+        try:
+            # For each team, resample the expected points
+            # This introduces variability as suggested in the paper
+            if samples_per_team > 1:
+                # Resample points based on uncertainty in player performance
+                sampled_df = player_df.copy()
+                # Add noise to expected points to simulate different sampling outcomes
+                noise = np.random.normal(0, 0.5, len(sampled_df))
+                sampled_df["sampled_points"] = sampled_df["sampled_points"] + noise
+                # Ensure no negative expected points
+                sampled_df["sampled_points"] = sampled_df["sampled_points"].clip(
+                    lower=0
+                )
+            else:
+                sampled_df = player_df
+
+            # Generate team with this sample
+            team = generate_fpl_team(
+                sampled_df,
+                budget=budget,
+                current_team=current_team,
+                free_transfers=free_transfers,
+            )
+
+            if team is not None:
+                teams.append(team)
+
+        except Exception as e:
+            logger.warning(f"Error generating team with current squad: {e}")
+
+        attempts_with_current += 1
+
+    # If we couldn't generate enough teams with the current squad, try without it
+    if len(teams) < num_teams:
+        logger.info(
+            f"Only generated {len(teams)} teams with current squad. Trying without current squad constraints."
         )
 
-        if team is not None:
-            teams.append(team)
+        remaining_teams = num_teams - len(teams)
+        for i in range(remaining_teams):
+            try:
+                # Resample points
+                if samples_per_team > 1:
+                    sampled_df = player_df.copy()
+                    noise = np.random.normal(0, 0.5, len(sampled_df))
+                    sampled_df["sampled_points"] = sampled_df["sampled_points"] + noise
+                    sampled_df["sampled_points"] = sampled_df["sampled_points"].clip(
+                        lower=0
+                    )
+                else:
+                    sampled_df = player_df
+
+                # Generate team without current squad constraints
+                team = generate_fpl_team(
+                    sampled_df,
+                    budget=budget,
+                    current_team=None,  # No current team constraint
+                    free_transfers=free_transfers,
+                )
+
+                if team is not None:
+                    team["note"] = "Generated without current team constraints"
+                    teams.append(team)
+            except Exception as e:
+                logger.warning(f"Error generating team without current squad: {e}")
+
+    # If we still have no teams, try one last time with a different approach
+    if len(teams) == 0:
+        logger.warning(
+            "Failed to generate any teams. Making one final attempt with simplified constraints."
+        )
+        try:
+            # Try one more time with simplified constraints
+            team = generate_fpl_team(
+                player_df,
+                budget=budget + 5,  # Slightly relaxed budget
+                current_team=None,  # No current team constraint
+                free_transfers=free_transfers,
+            )
+
+            if team is not None:
+                team["note"] = "Generated with relaxed constraints"
+                teams.append(team)
+        except Exception as e:
+            logger.error(f"Failed to generate any teams: {e}")
 
     # Sort teams by expected points
     teams.sort(key=lambda x: x["expected_points"], reverse=True)
+
+    if len(teams) == 0:
+        logger.error("Could not generate any valid teams")
+    else:
+        logger.info(f"Successfully generated {len(teams)} teams")
+
     return teams
 
 
 def display_team(team: Dict[str, Any], player_df: pd.DataFrame):
     """Display the selected team in a readable format"""
     logger.info("\n==== SELECTED TEAM ====")
+    if "note" in team:
+        logger.info(f"Note: {team['note']}")
     logger.info(f"Expected Points: {team['expected_points']:.2f}")
     logger.info(f"Team Cost: £{team['team_cost']:.1f}m")
 
@@ -432,19 +576,34 @@ def display_team(team: Dict[str, Any], player_df: pd.DataFrame):
 
     logger.info("\n--- Bench ---")
     for player_id in team["bench"]:
-        player = player_df.loc[player_id].iloc[0]
-        logger.info(
-            f"  {player_id} - {player['position']} - {player['team']} - £{player['price']}m - {player['sampled_points']:.2f}pts"
-        )
+        if player_id in player_df.index:
+            player = player_df.loc[player_id]
+            logger.info(
+                f"  {player_id} - {player['position']} - {player['team']} - £{player['price']}m - {player['sampled_points']:.2f}pts"
+            )
+        else:
+            logger.warning(
+                f"  {player_id} - DATA MISSING (player not in current dataframe)"
+            )
 
     if "players_in" in team and team["players_in"]:
         logger.info("\n--- Transfers In ---")
         for player_id in team["players_in"]:
-            player = player_df.loc[player_id].iloc[0]
-            logger.info(f"  {player_id} - {player['position']} - {player['team']}")
+            if player_id in player_df.index:
+                player = player_df.loc[player_id]
+                logger.info(f"  {player_id} - {player['position']} - {player['team']}")
+            else:
+                logger.warning(
+                    f"  {player_id} - DATA MISSING (player not in current dataframe)"
+                )
 
     if "players_out" in team and team["players_out"]:
         logger.info("\n--- Transfers Out ---")
         for player_id in team["players_out"]:
-            player = player_df.loc[player_id].iloc[0]
-            logger.info(f"  {player_id} - {player['position']} - {player['team']}")
+            if player_id in player_df.index:
+                player = player_df.loc[player_id]
+                logger.info(f"  {player_id} - {player['position']} - {player['team']}")
+            else:
+                logger.warning(
+                    f"  {player_id} - DATA MISSING (player not in current dataframe)"
+                )

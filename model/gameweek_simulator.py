@@ -82,6 +82,9 @@ class GameweekSimulator:
                 with open(file=gameweek_parameters_file, mode="wb") as f:
                     pickle.dump(obj=dixon_coles_team_parameters, file=f)
 
+            # Sample individual players' gameweek stats e.g. probability of scoring, assisting, starting e.t.c
+            players_with_stats = self._sample_player_stats(players_ability_df)
+
             fixture_points_df = []
             for _, fixture_row in fixtures_df.iterrows():
                 match_score_matrix = dixon_coles_prediction_model.simulate_match(
@@ -93,11 +96,18 @@ class GameweekSimulator:
                     ),
                     params=dixon_coles_team_parameters,
                 )
+                home_team = players_with_stats[
+                    players_with_stats["team"] == fixture_row["home_team"]
+                ]
+                away_team = players_with_stats[
+                    players_with_stats["team"] == fixture_row["away_team"]
+                ]
                 fixture_points = self._simulate_fixture(
-                    fixture_row,
-                    players_ability_df,
-                    position_minutes_df,
-                    match_score_matrix,
+                    fixture=fixture_row,
+                    home_team=home_team,
+                    away_team=away_team,
+                    position_minutes=position_minutes_df,
+                    match_score_matrix=match_score_matrix,
                 )
                 fixture_points_df.append(fixture_points)
 
@@ -110,23 +120,14 @@ class GameweekSimulator:
     def _simulate_fixture(
         self,
         fixture: pd.Series,
-        players_ability_df: pd.DataFrame,
+        home_team: pd.DataFrame,
+        away_team: pd.DataFrame,
         position_minutes: pd.DataFrame,
         match_score_matrix: NDArray,
     ) -> pd.DataFrame:
         """
         Simulates a single fixture by sampling starting lineups, minutes played, and scoring points.
         """
-        # Sample individual players' stats
-        players_with_stats = self._sample_player_stats(players_ability_df)
-
-        home_team = players_with_stats[
-            players_with_stats["team"] == fixture["home_team"]
-        ]
-        away_team = players_with_stats[
-            players_with_stats["team"] == fixture["away_team"]
-        ]
-
         # Sample starting lineups
         home_team_starting = self._sample_starting_lineup(
             home_team, fixture["home_team"]

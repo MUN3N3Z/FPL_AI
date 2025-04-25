@@ -66,7 +66,8 @@ def plot_learning_curve(episode_rewards):
 if __name__ == "__main__":
     # Configuration
     train_year = "2022"
-    num_episodes = 25
+    test_year = "2023"
+    num_episodes = 50
     search_depth = 3
     discount_factor = 0.5
 
@@ -109,13 +110,13 @@ if __name__ == "__main__":
         episode_rewards = train_agent(env=train_env, num_episodes=num_episodes)
         logger.info("Completed training BayesianQLearningAgent")
         with open(file=pickled_agent_path, mode="wb") as f:
-            pickle.dump(agent)
+            pickle.dump(agent, file=f)
         logger.info(f"Saved trained agent as a pickle file in {pickled_agent_path}")
         # Plot learning curve
         plot_learning_curve(episode_rewards)
 
     logger.info("Loading 2023-24 fixtures (evaluation) ...")
-    test_year = "2023"
+
     # Load 2022-23 season fixtures
     fixtures_2023_24 = pd.read_csv(
         filepath_or_buffer=f"{DATA_FOLDER}/{format_season_name(test_year)}/fixtures.csv"

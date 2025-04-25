@@ -41,6 +41,9 @@ def generate_fpl_team(
         Dictionary containing selected team information
     """
     # First, handle the case where players in current_team are not in player_df
+    missing_players = []
+    valid_current_team = None
+
     if current_team is not None:
         # Check if all current team players are in the dataframe
         missing_players = [p for p in current_team if p not in player_df.index]
@@ -51,21 +54,21 @@ def generate_fpl_team(
             )
 
             # Filter out missing players from current_team
-            current_team = [p for p in current_team if p in player_df.index]
+            valid_current_team = [p for p in current_team if p in player_df.index]
 
-            # If too many players are missing, free transfer might be unrealistic
-            if len(missing_players) > free_transfers:
+            # If all players are missing, treat as new team
+            if len(valid_current_team) == 0:
                 logger.warning(
-                    f"More players missing ({len(missing_players)}) than free transfers available ({free_transfers}). "
-                    f"Will proceed with the available players, but expect transfer penalties."
+                    "No valid players remain in current team. Treating as a new team selection."
                 )
+                valid_current_team = None
+        else:
+            valid_current_team = (
+                current_team.copy()
+                if isinstance(current_team, list)
+                else list(current_team)
+            )
 
-    # If no valid current team players remain, treat as a new team
-    if current_team is not None and len(current_team) == 0:
-        logger.warning(
-            "No valid players remain in current team. Treating as a new team selection."
-        )
-        current_team = None
     # Enforce unique players
     player_df = player_df.sort_values(by="sampled_points", ascending=False)
     player_df = (
@@ -87,16 +90,25 @@ def generate_fpl_team(
         for player_id in player_df.index
     }
 
-    # Create variables for transfers
-    if current_team is not None:
-        transfers_in = pulp.LpVariable(name="transfers_in", lowBound=0, cat="Integer")
-        transfers_out = pulp.LpVariable(name="transfers_out", lowBound=0, cat="Integer")
+    # Create variables for transfers (only for valid current team players)
+    if valid_current_team is not None:
+        # Variable for discretionary transfers (limited by free_transfers)
+        discretionary_transfers = pulp.LpVariable(
+            name="discretionary_transfers", lowBound=0, cat="Integer"
+        )
+
+        # Variable for actual transfers made (counting only valid players, not missing ones)
+        actual_transfers = pulp.LpVariable(
+            name="actual_transfers", lowBound=0, cat="Integer"
+        )
+
+        # Variable for extra transfers beyond free allowance
         extra_transfers = pulp.LpVariable(
             name="extra_transfers", lowBound=0, cat="Integer"
         )
 
     # Set objective: Maximize expected points
-    if current_team is not None:
+    if valid_current_team is not None:
         # Consider transfer penalties (-4 points per extra transfer)
         model += (
             pulp.lpSum(
@@ -257,21 +269,36 @@ def generate_fpl_team(
         "min_starting_fwd",
     )
 
-    # 6. Transfer constraints (if updating an existing team)
-    if current_team is not None:
-        # Count players transferred out
+    # 6. Transfer constraints (only for valid current team players)
+    if valid_current_team is not None:
+        # Count actual transfers (players dropping out of valid_current_team)
         model += (
-            transfers_out
-            == pulp.lpSum([1 - x[player_id] for player_id in current_team]),
-            "transfers_out_count",
+            actual_transfers
+            == pulp.lpSum([1 - x[player_id] for player_id in valid_current_team]),
+            "actual_transfers_count",
         )
 
-        # Count players transferred in (must equal transfers out)
-        model += (transfers_in == transfers_out, "transfers_balance")
-
-        # Calculate extra transfers
+        # Only one discretionary transfer (the rest are forced due to missing players)
+        # Note: We use '<=1' instead of '==1' to allow for no discretionary transfers if needed
         model += (
-            extra_transfers >= transfers_in - free_transfers,
+            discretionary_transfers <= 1,
+            "max_discretionary_transfers",
+        )
+
+        # Discretionary transfers can't exceed actual transfers
+        model += (
+            discretionary_transfers <= actual_transfers,
+            "discretionary_vs_actual",
+        )
+
+        # Extra transfers = actual transfers - free transfers - forced transfers
+        # Where forced transfers = number of missing players
+        forced_transfers = len(missing_players)
+        available_free_transfers = max(0, free_transfers - forced_transfers)
+
+        model += (
+            extra_transfers
+            >= actual_transfers - discretionary_transfers - available_free_transfers,
             "extra_transfers_count",
         )
 
@@ -285,7 +312,7 @@ def generate_fpl_team(
         )
 
         # Try again with relaxed constraints if we have a current team
-        if current_team is not None:
+        if valid_current_team is not None:
             # Start fresh
             return generate_fpl_team(
                 player_df=player_df,
@@ -338,15 +365,33 @@ def generate_fpl_team(
         player_df.loc[player_id, "sampled_points"] for player_id in starting_players
     )
 
-    if current_team is not None:
-        transfers_made = int(pulp.value(transfers_in))
+    # Transfer statistics
+    if valid_current_team is not None:
+        # Get actual number of transfers made
+        actual_transfers_made = int(pulp.value(actual_transfers))
+
+        # Get discretionary transfers (the ones we chose to make)
+        discretionary_transfers_made = int(pulp.value(discretionary_transfers))
+
+        # Get forced transfers (due to missing players)
+        forced_transfers_made = len(missing_players)
+
+        # Calculate extra transfers beyond free allowance
         extra_transfers_made = int(pulp.value(extra_transfers))
+
+        # Calculate transfer penalty (only for discretionary transfers beyond allowance)
         transfer_penalty = 4 * extra_transfers_made
         expected_points -= transfer_penalty
+
+        # Total transfers including missing players
+        total_transfers = actual_transfers_made + forced_transfers_made
     else:
-        transfers_made = 0
+        actual_transfers_made = 0
+        discretionary_transfers_made = 0
+        forced_transfers_made = 0
         extra_transfers_made = 0
         transfer_penalty = 0
+        total_transfers = 0
 
     # Identify best captain (highest expected points)
     captain_id = (
@@ -371,22 +416,22 @@ def generate_fpl_team(
     }
 
     if current_team is not None:
-        result["transfers"] = transfers_made
+        result[
+            "transfers"
+        ] = discretionary_transfers_made  # Only count discretionary transfers
+        result[
+            "forced_transfers"
+        ] = forced_transfers_made  # Count forced transfers separately
+        result[
+            "total_transfers"
+        ] = total_transfers  # Total transfers including forced ones
         result["transfer_penalty"] = transfer_penalty
-        players_in = [p for p in selected_players if p not in current_team]
-        players_out = [p for p in current_team if p not in selected_players]
 
-        # Handle the case where initial team had missing players by adding them to players_out
-        missing_players_out = (
-            [p for p in missing_players if p not in players_out]
-            if "missing_players" in locals()
-            else []
-        )
-        if missing_players_out:
-            logger.info(
-                f"Adding missing players to the 'players_out' list: {missing_players_out}"
-            )
-            players_out.extend(missing_players_out)
+        # Determine which players are coming in
+        players_in = [p for p in selected_players if p not in current_team]
+
+        # Determine which players are going out (including missing players)
+        players_out = [p for p in current_team if p not in selected_players]
 
         result["players_in"] = players_in
         result["players_out"] = players_out
@@ -548,7 +593,15 @@ def display_team(team: Dict[str, Any], player_df: pd.DataFrame):
     logger.info(f"Team Cost: £{team['team_cost']:.1f}m")
 
     if "transfers" in team:
-        logger.info(f"Transfers Made: {team['transfers']}")
+        if "forced_transfers" in team and team["forced_transfers"] > 0:
+            logger.info(f"Discretionary Transfers: {team['transfers']}")
+            logger.info(
+                f"Forced Transfers (missing players): {team['forced_transfers']}"
+            )
+            logger.info(f"Total Transfers: {team['total_transfers']}")
+        else:
+            logger.info(f"Transfers Made: {team['transfers']}")
+
         if team["transfer_penalty"] > 0:
             logger.info(f"Transfer Penalty: {team['transfer_penalty']} points")
 
@@ -605,5 +658,5 @@ def display_team(team: Dict[str, Any], player_df: pd.DataFrame):
                 logger.info(f"  {player_id} - {player['position']} - {player['team']}")
             else:
                 logger.warning(
-                    f"  {player_id} - DATA MISSING (player not in current dataframe)"
+                    f"  {player_id} - DATA MISSING (player not available in dataset)"
                 )

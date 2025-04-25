@@ -1,35 +1,14 @@
 The task of picking a team for Fantasy Premier League (FPL) is an ardous one to say the least. One has to balance their bias for 
 the team they support and their analysis of high performing players. Furthermore, the time difference between the United States and England makes 
-it difficult for supporters of English Premier League (EPL) teams to watch live matches since they're usually played very early on the weekends. This becomes 
-even more difficult for students and the working class who dedicate Saturday mornings to sleeping in after a long week of work. As such, many a FPL manager 
-drop out from active team management because they don't have enough time to keep up with the matches, transfer news, injury updates, gameweek restructuring news, and 
-other news that require a religious following of the EPL. This is why I came up with this passion project of building an agent that could actively manage an FPL team so that 
-you can spare your weekend mornings to catching up with sleep.
+it difficult for supporters of English Premier League (EPL) teams, living in the U.S., to watch live matches since they're usually aired very early on the weekends. This becomes 
+even more difficult for students (like me) and the working class who dedicate Saturday mornings to sleeping in after a long week of work. As such, many a FPL manager 
+drop out from active team management because they don't have enough time to keep up with the matches, transfer news, injury updates, gameweek restructuring news, andother news that require a religious following of the EPL. This is why I came up with this passion project of building an agent that could actively manage an FPL team so that you can spare your weekend mornings to catching up with sleep.
 
-How well can an agent, trained through reinforcement learning, perform compared to the average FPL manager? FPL is a social sport. Where's the fun in playing FPL if you don't play against your mates? 
-Be it in a classic league or a head-to-head one, I always look forward to seeing where I place at the end of a gameweek. Therefore, I just can't let any agent run my FPL team. There's too much on the line. 
-The agent was trained on data from 2016/17 season to 2022/23 and evaluation was done using data from the last complete season - 2023/24.
+How well can an agent, trained through reinforcement learning, perform compared to the average FPL manager? Can this agent outperform the average human manager without playing any special chips? These are the main research questions I aim to answer in this paper. FPL is a social sport. Where's the fun in playing FPL if you don't play against your mates? 
+Be it in a classic league or a head-to-head one, I always look forward to seeing where I place at the end of a gameweek. Therefore, I just can't let any agent run my FPL team. There's too much on the line - my reputation.
 
+The most significant work in the area of modeling sequentially-optimal team formation strategies within FPL was done by Terence Matthews and Sarvapali Ramchurn and Georgios Chalkiadakis in their paper - "Competing with Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains". Their groundbreaking work demonstrated that an AI manager could perform at the top percentile when competing against 2.5 million human players, despite lacking complete information on footballer performances that humans could access. \cite{matthews2012}. My paper builds upon this model by constraining the AI agent's access to special chips i.e. the wildcard chip that enables it to make unlimited transfers at any gameweek while training it on a larger swathe of data. The agent was trained on data from 2016/17 season to 2022/23 and evaluation was done using data from the last complete season - 2023/24.
 
+I took a Bayesian approach in modeling players' abilities due to uncertainities in their performances. Their priors were informed by data from past seasons. The team selection process was modeled as a Markov Decision Process, which I solved using Bayesian Q-learning as described in \cite{matthews2012}.
 
-
-Essentially, the introduction is a summary of the paper. A great introduction is one that makes the reader excited to read the rest of the paper. A good introduction encourages readers to read your work with interest and prepares them to understand it better. 
-
-Remember the three-pass reading that we learned in Lecture 2 of the class, CPSC 490 Senior Project? 
-When you write a paper, you can expect most reviewers (and readers) to make only one pass over it. (i.e. 5 min, max 10 min.) Then, decide whether they will read more or put it aside. 
-
-
-A strong introduction does the following in this general order:
-\begin{itemize}
-    \item Motivates why the subject of the research is important
-    \item States the research question
-    \item Discusses where the paper fits in existing literature
-    \item Describes the contribution of the paper
-    \item States the research methods
-    \item States the main results
-\end{itemize}
-
-
-In this template, section titles are provided as suggestions, and you are more than welcome to change them, except for Abstract, Introduction, Background, Related Work, and Conclusion, which are must-have. 
-
-Please share the document with your advisor with edit previllage. Comments can be provided \blue { this way, and comments can be removed when addressed.}
+[MAIN RESULTS]

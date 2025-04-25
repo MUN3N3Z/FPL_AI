@@ -19,6 +19,41 @@
 
 \refsection{0}
   \datalist[entry]{none/global//global/global}
+    \entry{matthews2012}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=67a9fc98f02000f40afc4f01377ef721}{%
+           family={Matthews},
+           familyi={M\bibinitperiod},
+           given={Terence},
+           giveni={T\bibinitperiod}}}%
+        {{hash=e2171c981b05f25b3032b46695bb7602}{%
+           family={Ramchurn},
+           familyi={R\bibinitperiod},
+           given={Sarvapali\bibnamedelima D.},
+           giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=332fe145baa95f3abbfec32ceee09a4c}{%
+           family={Chalkiadakis},
+           familyi={C\bibinitperiod},
+           given={Georgios},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{fullhash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{bibnamehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{authorbibnamehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{authornamehash}{2a0db63b0382f23be15d92fce05daf83}
+      \strng{authorfullhash}{2a0db63b0382f23be15d92fce05daf83}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the AAAI Conference on Artificial Intelligence}
+      \field{month}{6}
+      \field{number}{1}
+      \field{title}{Competing with humans at fantasy football: {Team} formation in large partially-observable domains}
+      \field{volume}{26}
+      \field{year}{2012}
+    \endentry
     \entry{conn2017}{book}{}
       \name{author}{1}{}{%
         {{hash=38ae4d396fa75119f5328db9dcc40c1d}{%
@@ -36,8 +71,8 @@
       \strng{authorbibnamehash}{38ae4d396fa75119f5328db9dcc40c1d}
       \strng{authornamehash}{38ae4d396fa75119f5328db9dcc40c1d}
       \strng{authorfullhash}{38ae4d396fa75119f5328db9dcc40c1d}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{The Fall of the House of FIFA}
@@ -58,8 +93,8 @@
       \strng{authorbibnamehash}{225602381bd61b1619ef2e61888dcbae}
       \strng{authornamehash}{225602381bd61b1619ef2e61888dcbae}
       \strng{authorfullhash}{225602381bd61b1619ef2e61888dcbae}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Premier League Handbook 2023/24}
@@ -85,8 +120,8 @@
       \strng{authorbibnamehash}{652d78d02e7b06cac97e5434f9d44406}
       \strng{authornamehash}{652d78d02e7b06cac97e5434f9d44406}
       \strng{authorfullhash}{652d78d02e7b06cac97e5434f9d44406}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Journal of the Economics of Business}
@@ -121,8 +156,8 @@
       \strng{authorbibnamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
       \strng{authornamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
       \strng{authorfullhash}{958b8d76e5f1dc076ea6a0b6cbb64613}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Journal of Sport Policy and Politics}
@@ -155,8 +190,8 @@
       \strng{authorbibnamehash}{629b189f4b8eded96da0575b5bdbf6af}
       \strng{authornamehash}{629b189f4b8eded96da0575b5bdbf6af}
       \strng{authorfullhash}{629b189f4b8eded96da0575b5bdbf6af}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{National Pastime: How Americans Play Baseball and the Rest of the World Plays Soccer}
@@ -178,8 +213,8 @@
       \strng{authornamehash}{6b2757d2c251fac9f9c08989e869930e}
       \strng{authorfullhash}{6b2757d2c251fac9f9c08989e869930e}
       \field{extraname}{1}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Official Fantasy Premier League Participation Statistics}
@@ -210,8 +245,8 @@
       \strng{authorbibnamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
       \strng{authornamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
       \strng{authorfullhash}{c1797b1115ad0e1b6640bfb3efe74cfe}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Transactions in Operational Research}
@@ -235,8 +270,8 @@
       \strng{authornamehash}{6b2757d2c251fac9f9c08989e869930e}
       \strng{authorfullhash}{6b2757d2c251fac9f9c08989e869930e}
       \field{extraname}{2}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Rules}
@@ -419,41 +454,6 @@
       \field{pages}{93\bibrangedash 104}
       \range{pages}{12}
     \endentry
-    \entry{matthews2012}{inproceedings}{}
-      \name{author}{3}{}{%
-        {{hash=67a9fc98f02000f40afc4f01377ef721}{%
-           family={Matthews},
-           familyi={M\bibinitperiod},
-           given={Terence},
-           giveni={T\bibinitperiod}}}%
-        {{hash=e2171c981b05f25b3032b46695bb7602}{%
-           family={Ramchurn},
-           familyi={R\bibinitperiod},
-           given={Sarvapali\bibnamedelima D.},
-           giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
-        {{hash=332fe145baa95f3abbfec32ceee09a4c}{%
-           family={Chalkiadakis},
-           familyi={C\bibinitperiod},
-           given={Georgios},
-           giveni={G\bibinitperiod}}}%
-      }
-      \strng{namehash}{2a0db63b0382f23be15d92fce05daf83}
-      \strng{fullhash}{2a0db63b0382f23be15d92fce05daf83}
-      \strng{bibnamehash}{2a0db63b0382f23be15d92fce05daf83}
-      \strng{authorbibnamehash}{2a0db63b0382f23be15d92fce05daf83}
-      \strng{authornamehash}{2a0db63b0382f23be15d92fce05daf83}
-      \strng{authorfullhash}{2a0db63b0382f23be15d92fce05daf83}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{booktitle}{Proceedings of the AAAI Conference on Artificial Intelligence}
-      \field{month}{6}
-      \field{number}{1}
-      \field{title}{Competing with humans at fantasy football: {Team} formation in large partially-observable domains}
-      \field{volume}{26}
-      \field{year}{2012}
-    \endentry
     \entry{bialkowski2014}{inproceedings}{}
       \name{author}{6}{}{%
         {{hash=f6dac99ead86f6e198b80b80054ec37e}{%
@@ -583,8 +583,8 @@
       \strng{authorbibnamehash}{0919c3bf63ce908310fafd87bb3f100e}
       \strng{authornamehash}{0919c3bf63ce908310fafd87bb3f100e}
       \strng{authorfullhash}{0919c3bf63ce908310fafd87bb3f100e}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Machine Learning}
@@ -617,8 +617,8 @@
       \strng{authorbibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{authornamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{authorfullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{edition}{2}
@@ -649,8 +649,8 @@
       \strng{authorbibnamehash}{c64d68b3cc5a4a0ae2743d0031e238e9}
       \strng{authornamehash}{c64d68b3cc5a4a0ae2743d0031e238e9}
       \strng{authorfullhash}{c64d68b3cc5a4a0ae2743d0031e238e9}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Journal of Financial Studies}
@@ -1136,6 +1136,28 @@
       \field{year}{2020}
       \field{pages}{569\bibrangedash 584}
       \range{pages}{16}
+    \endentry
+    \entry{clarke2024}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=77edc5ea7af99ea435c5c31c481a9137}{%
+           family={Clarke},
+           familyi={C\bibinitperiod},
+           given={Adrian},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{77edc5ea7af99ea435c5c31c481a9137}
+      \strng{fullhash}{77edc5ea7af99ea435c5c31c481a9137}
+      \strng{bibnamehash}{77edc5ea7af99ea435c5c31c481a9137}
+      \strng{authorbibnamehash}{77edc5ea7af99ea435c5c31c481a9137}
+      \strng{authornamehash}{77edc5ea7af99ea435c5c31c481a9137}
+      \strng{authorfullhash}{77edc5ea7af99ea435c5c31c481a9137}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{https://www.premierleague.com/news/4030093}
+      \field{title}{Season trends: Top teams converge on formations}
+      \field{year}{2024}
     \endentry
     \entry{sheehan2018}{misc}{}
       \name{author}{1}{}{%

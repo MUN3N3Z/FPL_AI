@@ -23,8 +23,8 @@ Participants (known as ``managers'') are allocated a virtual budget (£100 milli
 The budget constraint forces managers to balance premium-priced elite players with cheaper options. Each gameweek, managers select 11 players from their 15-player squad to form a starting lineup, with the remaining 4 players on the bench. Additional constraints include:
 \begin{itemize}
     \item Maximum of 3 players from any single Premier League club
-    \item Formation requirements (minimum of 1 goalkeeper, 3 defenders, and 1 forward)
-    \item Limited free transfers between gameweeks (typically 1 per week, with additional transfers costing points) \cite{fpl2024rules}
+    \item Formation requirements (minimum of 1 goalkeeper, 3 defenders, 3 midfielders, and 1 forward)
+    \item Limited free transfers between gameweeks (typically 1 per week, with additional transfers costing 4 points each) \cite{fpl2024rules}
 \end{itemize}
 
 \subsubsection{Scoring System} \label{ch:scoring_guide}
@@ -32,7 +32,7 @@ The budget constraint forces managers to balance premium-priced elite players wi
 Points are awarded based on players' real-world performance metrics:
 \begin{itemize}
     \item Appearance (playing at least 60 minutes): 2 points
-    \item Goals: 6 points (midfielder), 4 points (forward), 6 points (defender/goalkeeper)
+    \item Goals: 5 points (midfielder), 4 points (forward), 6 points (defender), 10 points (goalkeeper)
     \item Assists: 3 points
     \item Clean sheets: 4 points (defender/goalkeeper), 1 point (midfielder)
     \item Saves: 1 point per 3 saves (goalkeeper)
@@ -55,13 +55,13 @@ FPL includes several strategic elements that increase its complexity:
 \begin{itemize}
     \item \textbf{Captain}: Managers designate one player as captain each gameweek, doubling their points
     \item \textbf{Vice-captain}: A backup who becomes captain if the original captain doesn't play
-    \item \textbf{Chips}: Special boosts used once per season:
+    \item \textbf{Chips}: Special boosts used once or twice per season, but only one can be activated per gameweek:
     \begin{itemize}
         \item Bench Boost: Points from bench players count for one gameweek
         \item Triple Captain: Triple (rather than double) points for the captain
-        \item Free Hit: Unlimited free transfers for one gameweek only
+        \item Free Hit: Unlimited free transfers for one gameweek only. Cannot be used in the first gameweek
         \item Assistant Manager: Add a manager to your team to score points for three consecutive gameweeks
-        \item Wildcard: Unlimited free transfers that permanently change the team \cite{fpl2024rules}
+        \item Wildcard (x2): Unlimited free transfers that permanently change the team \cite{fpl2024rules}
     \end{itemize}
 \end{itemize}
 
@@ -135,7 +135,7 @@ FPL managers must balance competing objectives:
 The game spans 38 gameweeks, requiring both short and long-term planning:
 \begin{itemize}
     \item Weekly decisions: Starting lineup, captaincy, transfers
-    \item Medium-term decisions: Chip usage, planning for blank/double gameweeks
+    \item Medium-term decisions: Chip usage, planning for Blank/Double gameweeks
     \item Season-long decisions: Overall strategy and style of play \cite{constantinou2019}
 \end{itemize}
 
@@ -147,7 +147,7 @@ Fantasy Premier League presents an ideal environment for reinforcement learning 
 
 FPL naturally fits into the Markov Decision Process framework:
 \begin{itemize}
-    \item \textbf{States}: Current team composition, budget, available transfers, fixture schedule
+    \item \textbf{States}: Current team composition, budget, available transfers, gameweek
     \item \textbf{Actions}: Transfers, captain selection, bench order, chip usage
     \item \textbf{Transitions}: How actions transform the state (affected by real-world player performances)
     \item \textbf{Rewards}: Gameweek points earned

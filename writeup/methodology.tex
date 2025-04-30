@@ -1,13 +1,13 @@
-\section{Introduction to Methodology}
+\section{Introduction}
 My methodological approach in this project can be divided into three: 
 \begin{itemize}
     \item modeling beliefs on players' abilities in a Bayesian manner
     \item modeling FPL's team selection process as a Belief-State Markov Decision Process (BSMDP)
     \item solving the MDP using Bayesian Q-learning
 \end{itemize}
-This methodology is similar to the one described in the paper - "Competing with Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains" \cite{matthews2012} but with a few alterations. Instead of giving the agent unlimited transfers during the 8th and 23rd gameweeks i.e. playing a wildcard chip, my agent only got one free transfer per gameweek as per the standard FPL rules. Further, the agent does not utilize any other special chips e.g. free hit, bench boost, assistant manager, and triple captain as described in \ref{ch:special_features}.
+This methodology is similar to the one described in the paper - "Competing with Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains" \cite{matthews2012} but with a few alterations. Instead of giving the agent unlimited transfers during the 8th and 23rd gameweeks i.e. playing a Wildcard chip, my agent only got one free transfer per gameweek as per the standard FPL rules. Further, the agent does not utilize any other special chips e.g. free hit, bench boost, assistant manager, and triple captain as described in \ref{ch:special_features}.
 
-I also used team-specific formations while sampling starting lineups for simulated fixtures in the 2022/23 and 2023/24 seasons to provide accurate team compisition for my scoring model as discussed in table \ref{tab:fomation_table} 
+I also used team-specific formations while sampling starting lineups for simulated fixtures in the 2022/23 and 2023/24 seasons to provide accurate team composition for my scoring model as depicted in table \ref{tab:fomation_table} 
 
 \section{Modeling players' abilities}
 Modeling a player's ability in a manner that captured the uncertainity of their performance in games was important in this project. As such, I took a Bayesian apprach to model this belief by maintaining a distribution over possible performance levels. Furthermore, a Bayesian model allowed me to incorporate domain knowledge through priors using performance data from previous seasons. This was crucial in giving good players a higher baseline even when they experience a slump in their performance. The players' abilities I sought to model are the probabilities of a player: 
@@ -32,17 +32,17 @@ Defining the following terms is essential in describing my methodology. For the 
     \item $M_i$ as the set of matches in gameweek $i$.
     \item $P_i$ as the set of players available for selection in gameweek $i$.
     \item $A_i$ as the set of actions available in gameweek $i$, where $a \in A_i$ is a subset of $P_i$ and observes all team selection constraints.
-    \item $p_i \in P_i$ is associated with its FPL-designated position $pos(p_i)$ and price $pr(p_i)$.
-    \item $\tau_p \in \tau$ is a system of distributions representing the player's performance/influence on the matchplay.
+    \item $p_i \in P_i$ is associated with its FPL-designated position $pos(p_i)$ and price $price(p_i)$.
+    \item $\tau_p \in \tau$ is a system of distributions representing the player's ability i.e. performance/influence on the matchplay.
     \item $O_i$ is the set of match observations in gameweek $i$.
     \item $o \in O_i$ includes both the result of the matches and the performance of the players in the selected team e.g. goals, assists, clean sheets, yellow cards, red cards, bonus points. The probability of each $o \in O_i$ is somehow dependent on the players' characteristics ($\tau$) i.e. a team with strong attackers is more likely to score goals, therefore, $P(o)$ is dependent on $\tau$.
-    \item $R(o, a_{prev}, a_{curr})$ is the reward function, which returns the points scored by the selected team $a_{curr}$, given the match observations $o$. The previous team $a_{prev}$ is also provided to penalize the agent for any poor player transfers or transfers beyond the allowed number.
+    \item $R(o, a_{prev}, a_{curr})$ is the reward function, which returns the points scored by the selected team $a_{curr}$, given the match observations $o$. The previous team $a_{prev}$ is also provided to penalize the agent for any poor player transfers.
 \end{itemize}
 
-I use three distributions to model players' abilities:
+I used three distributions to model players' abilities:
 \begin{itemize}
     \item $\rho_p$ - a three-state categorical distribution representing the player's probability of starting a match, being substituted, or not playing at all i.e. (start, sub, unused).
-    \item $\omega_p$ - a Bernoulli/Binomial distribution over a single trial, representing the probability of a player scoring a goal given he was playiong at the time
+    \item $\omega_p$ - a Bernoulli/Binomial distribution over a single trial, representing the probability of a player scoring a goal given he was playing at the time
     \item $\psi_p$ - a Bernoulli distribution representing the probability of a player providing an assist given he was playing at the time
 \end{itemize}
 Using a Bayesian approach allowed me to leverage the respective distributions' conjugates to update the players' priors (belief) using data from previous seasons. I defined uniform priors for all players as described in \cite{matthews2012} as follows: $$\omega_p \sim Beta(1, 1), \psi_p \sim Beta(1, 1),  \rho_p \sim Dirichlet(\frac{1}{4}, \frac{1}{4}, \frac{1}{4})$$
@@ -53,7 +53,7 @@ Samples of a player's ability, $\tau_p$, and minutes played in a game $S_{pos(p)
 
 I simulated a gameweek by simulating each fixture in the gameweek as follows (The procedure focuses on the home team for conciseness but is also applicable to the away team):
 \begin{itemize}
-    \item Define $P_H$ and $P_A$ as the set of players available the home and away teams respectively. I used formation frequency data from the English Premier League to determine individual team compositions \cite{clarke2024}. As such, I assigned each team a default formation as follows:
+    \item Define $P_H$ and $P_A$ as the set of players available the home and away teams respectively. I used formation frequency data from the English Premier League to determine individual team compositions \cite{clarke2024}. As such, I assigned each team a default formation as shown in table \ref{tab:fomation_table}.
     \begin{table}[h!]
         \centering
         \begin{tabular}{|c|c|}
@@ -70,16 +70,43 @@ I simulated a gameweek by simulating each fixture in the gameweek as follows (Th
         \caption{Favored formations for the 2023/24 Premier League Season}
         \label{tab:fomation_table}
     \end{table}
-    \item I, however, had to make some modifications when constituting these teams using the aforementioned formations. In the case where a team does not have enough forwards to fill the required number as per their assigned formation (as was the case with Totttenham and Newcastle), I used midfielders instead. Further, since Premier League data does not distinguish between attacking and defensive midfielders, I simplified formations with such distinctions e.g. 3-4-2-1 and 4-2-3-1 by grouping both as general midfielders. In this case, my model assigns six midfielders to a 3-4-2-1 formation and five to 4-2-3-1.
+    \begin{itemize}
+        \item I, however, had to make some modifications when constituting these teams using the aforementioned formations. In the case where a team does not have enough forwards to fill the required number as per their assigned formation (as was the case with Totttenham (TOT) and Newcastle (NEW)), I used midfielders instead. Further, since Premier League data does not distinguish between attacking and defensive midfielders, I simplified formations with such distinctions e.g. 3-4-2-1 and 4-2-3-1 by grouping both as general midfielders. In this case, my model assigns six midfielders to a 3-(4-2)-1 formation and five to 4-(2-3)-1.
+    \end{itemize}
     \item Sample $\tau_p$ for each player $p \in P_H$  from the belief model $Pr(\tau_p | b_i)$
     \item Randomly select eleven players from $P_H$ in proportion to their probability of starting the match i.e. $Pr(\rho_p = start)$ These players constitute the starting lineup $L_H$
     \item The minute each player $p$ leaves the pitch is sampled from the $S_{pos}$ distribution for the player's $pos(p)$
     \item Each player in $P_H$ and not in $L_H$ is assigned to the set of substitutes $U_H$
     \item For every minute that a player in $L_H$ is set to get substituted:
+    \begin{itemize}
         \item We randomly select a player from $U_H$ to replace the outgoing player in proportion to the probability of the player being substituted i.e. $Pr(\rho_p = sub)$
         \item The replacement is added to $L_H$ (removed from $U_H$). We further assume that the player being substituted is not substituted again in the same match.
-    \item We use the Dixon-Coles model \cite{dixon1997} predict the outcome of the fixture. The model extends the basic Poisson model for soccer prediction by assuming that goals scored by teams follow a Poisson distribution. It also accounts for team-specific attacking and defensive threats, and home advantage while adding a crucial correction for the dependency between team's scores, especially for low-scoring results (0-0, 1-0, 0-1, 1-1) I was fortunate to find a clean implementation of the Dixon-Coles model on David Sheehan's article on "Predicting Football Results with Statistical Modelling: Dixon-Coles and Time-Weighting" \cite{sheehan2018}
-    \item If a goal is scored, it is allocated to player $p$ with probability $Pr(\omega_p = 1)$ while an assist is allocated to player $p$ with probability $Pr(\psi_p = 1)$. I assume that every goal has attributed assist and that no one player will score or assist twice in the same game.
+    \end{itemize}
+    \item We use the Dixon-Coles model \cite{dixon1997} predict the outcome of the fixture. The model extends the basic Poisson model for soccer prediction by assuming that goals scored by teams follow a Poisson distribution. It also accounts for team-specific attacking and defensive threats, and home advantage while adding a crucial correction for the dependency between team's scores, especially for low-scoring results (0-0, 1-0, 0-1, 1-1). I was fortunate to find a clean implementation of the Dixon-Coles model on David Sheehan's article on "Predicting Football Results with Statistical Modelling: Dixon-Coles and Time-Weighting" \cite{sheehan2018}
+    \item If a goal is scored, it is allocated to player $p$ with the following weighted probability. First, we convert the probability of scoring or assisting during a full match into a per-minute rate parameter:
+    \begin{align}
+    \text{scoring\_rate\_per\_minute} &= \frac{-\ln(1 - \text{score\_prob})}{\text{MATCH\_MINUTES}} \\
+    \text{assisting\_rate\_per\_minute} &= \frac{-\ln(1 - \text{assist\_prob})}{\text{MATCH\_MINUTES}}
+    \end{align}
+    where MATCH\_MINUTES = 90, is the standard length of a soccer game, without accounting for extra time.
+
+    If events (goals/assists) occur according to a Poisson process with constant rate $\lambda$ Then the probability of at least one event occurring in time $t$ is:
+    \begin{align}
+        P(\text{at least one event in time $t$}) = 1 - e^{-\lambda t}
+    \end{align}
+    \item Solving for $\lambda$:
+    \begin{align}
+        P &= 1 - e^{-\lambda t} \\
+        1 - P &= e^{-\lambda t} \\
+        \ln(1 - P) &= -\lambda t \\
+        \lambda &= \frac{-\ln(1 - P)}{t}
+    \end{align}
+    Once we have the per-minute rates, we recalculate the probability of scoring or assisting based on the actual minutes played:
+    \begin{align}
+    \text{weighted\_score\_prob} &= 1 - e^{-\text{scoring\_rate\_per\_minute} \times \text{minutes\_played}} \\
+    \text{weighted\_assist\_prob} &= 1 - e^{-\text{assisting\_rate\_per\_minute} \times \text{minutes\_played}}
+    \end{align}
+    This approach accounts for the fact that a player who plays fewer minutes has less opportunity to score or assist. I assume that every goal has anattributed assist and that no one player will score or assist twice in the same game.
     
     \item Other point scoring guidelines i.e. scoring minutes played and clean sheets proceed at described in \ref{ch:scoring_guide}
 \end{itemize}
@@ -88,7 +115,7 @@ These point estimates were used in combination with the BSMDP reward function $R
 \section{Modeling the FPL team selection problem}
 Similar to the prior problem of modeling players' abilities, selecting an FPL team faces the fundamental problem of making decisions under uncertainity. One doesn't know whether a player will start a game, get injured, or even how long they will play. This is why I opted for a Belief-State Markov Decision Process (BSMDP) as opposed to the standard MDP. The former assumes perfect knowledge of states.
 
-Fpl is inherently sequential - decisions in gameweek 1 affect options in gameweek 2 and beyond due to budget constraints, free transfer limitations, and team value changes based on player price fluctuations. As such, the BSMDP naturally captures the sequential nature of FPL team selection. I also reinfor
+FPL is inherently sequential - decisions in gameweek 1 affect options in gameweek 2 and beyond due to budget constraints, free transfer limitations, and team value changes based on player price fluctuations. As such, the BSMDP naturally captures the sequential nature of FPL team selection.
 
 The Belief State Markov Decision Process is defined by the tuple $(\mathcal{S}, \mathcal{A}, \mathcal{T}, \mathcal{R}, \mathcal{O}, \gamma)$, where:
 \begin{itemize}
@@ -122,8 +149,8 @@ Each player $p \in \mathcal{P}$ has attributes including:
 \begin{itemize}
     \item Position $pos(p) \in \{\text{GK}, \text{DEF}, \text{MID}, \text{FWD}\}$
     \item Captain $cap(p)$ if the player is chosen as the team captain for current gameweek
-    \item Likewise for vice captainship $vice\_cap(p)$. A player can only have one title for a gameweek.
-    \item Team $team(p) \in \{1, 2, ..., 20\}$ 
+    \item Likewise for vice captaincy $vice\_cap(p)$. A player can only have one title for a gameweek.
+    \item Team $team(p) \in \{1, 2, ..., 20\}$ the team that the player plays for
     \item Price $price(p) \in \mathbb{R}^+$
     \item Expected points $E[points(p, gw)] \in \mathbb{R}^+$ for each gameweek $gw$
 \end{itemize}
@@ -160,9 +187,9 @@ Similarly, we define binary variables for the starting lineup:
 \textbf{Squad composition constraints}
 \begin{align}
     \sum_{i \in \mathcal{P}} x_i &= 15 \quad \text{(exactly 15 players)} \\
-    \sum_{i \in \mathcal{P}{\text{GK}}} x_i &= 2 \quad \text{(exactly 2 goalkeepers)} \\
-    \sum_{i \in \mathcal{P}{\text{DEF}}} x_i &= 5 \quad \text{(exactly 5 defenders)} \\
-    \sum_{i \in \mathcal{P}{\text{MID}}} x_i &= 5 \quad \text{(exactly 5 midfielders)} \\
+    \sum_{i \in \mathcal{P}_{\text{GK}}} x_i &= 2 \quad \text{(exactly 2 goalkeepers)} \\
+    \sum_{i \in \mathcal{P}_{\text{DEF}}} x_i &= 5 \quad \text{(exactly 5 defenders)} \\
+    \sum_{i \in \mathcal{P}{_\text{MID}}} x_i &= 5 \quad \text{(exactly 5 midfielders)} \\
     \sum_{i \in \mathcal{P}_{\text{FWD}}} x_i &= 3 \quad \text{(exactly 3 forwards)}
 \end{align}
 
@@ -182,9 +209,9 @@ For each team $t$ in the Premier League:
 \begin{align}
     \text{starter}_i &\leq x_i \quad \forall i \in \mathcal{P} \quad \text{(starters must be in squad)} \\
     \sum{i \in \mathcal{P}} \text{starter}i &= 11 \quad \text{(exactly 11 starters)} \\
-    \sum{i \in \mathcal{P}_{\text{GK}}} \text{starter}i &= 1 \quad \text{(exactly 1 starting goalkeeper)} \\
-    \sum{i \in \mathcal{P}_{\text{DEF}}} \text{starter}i &\geq 3 \quad \text{(at least 3 starting defenders)} \\
-    \sum{i \in \mathcal{P}_{\text{MID}}} \text{starter}i &\geq 2 \quad \text{(at least 2 starting midfielders)} \\
+    \sum{i \in \mathcal{P}_{\text{GK}}} \text{starter}_i &= 1 \quad \text{(exactly 1 starting goalkeeper)} \\
+    \sum{i \in \mathcal{P}_{\text{DEF}}} \text{starter}_i &\geq 3 \quad \text{(at least 3 starting defenders)} \\
+    \sum{i \in \mathcal{P}_{\text{MID}}} \text{starter}_i &\geq 3 \quad \text{(at least 3 starting midfielders)} \\
     \sum{i \in \mathcal{P}_{\text{FWD}}} \text{starter}_i &\geq 1 \quad \text{(at least 1 starting forward)}
 \end{align}
 
@@ -192,7 +219,7 @@ For each team $t$ in the Premier League:
 When updating an existing team, we define additional variables for transfers:
 \begin{align}
     \text{transfers\_out} &= \sum_{i \in \text{current\_team}} (1 - x_i) \\
-    \text{transfers\_in} &= \text{transfers\_out} \\
+    \text{transfers\_in} &= \text{transfers\_out} = 1 (\text{Limit to one transfer})\\
     \text{extra\_transfers} &\geq \text{transfers\_in} - \text{free\_transfers}
 \end{align}
 
@@ -201,9 +228,9 @@ When updating an existing team, we define additional variables for transfers:
 The transition function $\mathcal{T}$ for the FPL environment can be decomposed as follows:
 
 \begin{align}
-    \mathcal{T}((\mathbf{B}, \mathbf{P}, \mathbf{L}, \mathbf{T}, \mathbf{GW}, \mathbf{Z}), a, (\mathbf{B}', \mathbf{P}', \mathbf{L}', \mathbf{T}', \mathbf{GW}', \mathbf{Z}')) = 
+    \mathcal{T}((\mathbf{B}, \mathbf{P}, \mathbf{L}, \mathbf{T}, \mathbf{GW}, \mathbf{Z}), a) = (\mathbf{B}', \mathbf{P}', \mathbf{L}', \mathbf{T}', \mathbf{GW}', \mathbf{Z}')
 \end{align}
-The transition is deterministic given the action and the player performance predictions.
+The transition is deterministic given the action $a$ and the player performance predictions $\mathbf{Z}$.
 
 \subsection{Reward Function}
 
@@ -249,7 +276,9 @@ After taking action $a$ and observing reward $r$, the belief distribution is upd
 \end{align}
 
 \subsection{Value of Perfect Information (VPI)}
-The environment uses the Value of Perfect Information (VPI) to balance exploration and exploitation as suggested in \cite{matthews2012}. For each action $a$, the VPI is calculated as:
+The environment uses the Value of Perfect Information (VPI) to balance exploration and exploitation as suggested in \cite{matthews2012}. For the best known action $a_1$, we only learn anything from performing it if $q*_{
+a1}$ is now lower than the currently estimated Q-value of $a_2$, $\hat{q_{a2}}$, the second-best action. Likewise, for all $a \neq a_1$, we only learn anything from performing $a$ if $q_a$ is now greater than $\hat{q_{a1}}$. The extent by which $q_a$ is greater than $\hat{q_{a1}}$ represents the gain in knowledge
+(and vice-versa for $a_1$). For each action $a$, the VPI is calculated as:
 
 \begin{align}
 VPI(a) = \begin{cases}
@@ -275,12 +304,12 @@ The action selection mechanism combines exploitation (choosing the action with t
 a_{selected} = \arg\max_a \{\mu_a + VPI(a)\}
 \end{align}
 
-Additionally, the environment dynamically updates the action subset by replacing actions with low utility (defined as $\mu_a + VPI(a) < \mu_{a^*}$) with newly generated promising actions as described in \ref{action_space}
+Additionally, the environment dynamically updates the action subset by replacing actions with low utility (defined as $\mu_a + VPI(a) < \mu_{a^*}$) with newly generated promising actions as described in \ref{action_space}. \cite{matthews2012}
 
 \subsection{Algorithm}
 The initial team is selected greedily based on expected points:
-The team is selected to maximize the sum of values while respecting the constraints on team composition, budget, and players per team.
-The overall algorithm for the FPL Belief State MDP is presented below \ref{alg:bayesianQLearning}:
+The team is selected to maximize the sum of sampled points while respecting the constraints on team composition, budget, and players per team.
+The overall algorithm for the FPL Belief State MDP is presented in \ref{alg:bayesianQLearning}:
 
 \begin{algorithm}
 \caption{Bayesian Q-Learning Algorithm}
@@ -306,11 +335,11 @@ The overall algorithm for the FPL Belief State MDP is presented below \ref{alg:b
 \section{Data Collection Methods}
 Implementing this project would not have been possible without clean, publicly-available data sources. 
 
-The most important data source was the gameweek-by-gameweek data in the \href{https://github.com/MUN3N3Z/FPL_AI/tree/main/data}{\underline{data folder}} of my code repository that was cloned from the FPL Historical Dataset. The dataset is available in the \href{https://github.com/vaastav/Fantasy-Premier-League/tree/master}{\underline{Github repository}} \cite{anand2016fantasypremierleague}.
+The most important data source was the gameweek-by-gameweek data in the \\ \href{https://github.com/MUN3N3Z/FPL_AI/tree/main/data}{\underline{data folder}} of my code repository that was cloned from the FPL Historical Dataset. The dataset is available in this \href{https://github.com/vaastav/Fantasy-Premier-League/tree/master}{\underline{Github repository}} \cite{anand2016fantasypremierleague}.
 
-While I later discovered that I could have retrieved season fixtures by manipulating the data from the forementioned repository, I ended up scraping fixture data from the unofficial Fantasy Premier League API using a \href{https://github.com/MUN3N3Z/FPL_AI/tree/main/scripts/save_season_fixtures.py}{\underline{Python script}}
+While I later discovered that I could have retrieved season fixtures by manipulating the data from the forementioned repository, I ended up scraping fixture data from the official Fantasy Premier League API using a \href{https://github.com/MUN3N3Z/FPL_AI/tree/main/scripts/save_season_fixtures.py}{\underline{Python script}}
 
-I also scraped fixture results i.e. home team, away team, home team goals, and away team goals from \href{www.football-data.co.uk}{football-data website}
+I also scraped fixture results i.e. home team, away team, home team goals, and away team goals from \href{www.football-data.co.uk}{\underline{football-data website}}
 
 \section{Technology Stack}
 \subsection{Hardware Infrastructure}
@@ -322,7 +351,7 @@ I also scraped fixture results i.e. home team, away team, home team goals, and a
 
 \subsection{Software framework}
 \begin{itemize}
-    \item Operating System: macOS Sequoia 15.4
+    \item Operating System: macOS Sequoia 15.4.1
     \item Programming Languages: Python
     \item Integrated Development Environment (IDE): Visual Studion Code
     \item Version Control: Git, GitHub
@@ -338,15 +367,15 @@ I also scraped fixture results i.e. home team, away team, home team goals, and a
 \subsection{Analysis \& Modeling}
 \begin{itemize}
     \item Statistical Analysis Tools: Numpy, Pymc
-    \item Machine Learning Libraries: Scipy, Gymnasium, PuLP
+    \item Machine Learning Libraries: Scipy (optimization), Gymnasium, PuLP \\(optimization)
     \item Visualization Tools: Matplotlib
-    \item Domain-Specific Libraries: fpl \cite{macLeod2019}
+    \item Domain-Specific Libraries: \href{https://fpl.readthedocs.io/en/latest/}{\underbar{FPL API Python Wrapper}} \cite{macLeod2019}
 \end{itemize}
 
 \subsection{Reproducibility Framework}
 \begin{itemize}
-    \item Environment Management: Miniconda virtual environment $fpl\_env$
+    \item Environment Management: Miniconda virtual environment ``fpl\_env''
     \item Dependency Management: Miniconda 
-    \item Random Seed Control: Set $RANDOM\_ SEED$ variable in constants.py
+    \item Random Seed Control: Set RANDOM\_SEED variable in constants.py
 \end{itemize}
 

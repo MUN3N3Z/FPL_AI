@@ -19,6 +19,26 @@
 
 \refsection{0}
   \datalist[entry]{none/global//global/global}
+    \entry{FPLStatistics2020}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=ff7b5828fa92ac54c7d52239e236f798}{%
+           family={FPLStatistics},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{ff7b5828fa92ac54c7d52239e236f798}
+      \strng{fullhash}{ff7b5828fa92ac54c7d52239e236f798}
+      \strng{bibnamehash}{ff7b5828fa92ac54c7d52239e236f798}
+      \strng{authorbibnamehash}{ff7b5828fa92ac54c7d52239e236f798}
+      \strng{authornamehash}{ff7b5828fa92ac54c7d52239e236f798}
+      \strng{authorfullhash}{ff7b5828fa92ac54c7d52239e236f798}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{https://x.com/fplstatistics/status/1285288364510310400}
+      \field{title}{FPL}
+      \field{year}{2020}
+    \endentry
     \entry{matthews2012}{inproceedings}{}
       \name{author}{3}{}{%
         {{hash=67a9fc98f02000f40afc4f01377ef721}{%
@@ -43,8 +63,8 @@
       \strng{authorbibnamehash}{2a0db63b0382f23be15d92fce05daf83}
       \strng{authornamehash}{2a0db63b0382f23be15d92fce05daf83}
       \strng{authorfullhash}{2a0db63b0382f23be15d92fce05daf83}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{Proceedings of the AAAI Conference on Artificial Intelligence}
@@ -53,6 +73,28 @@
       \field{title}{Competing with humans at fantasy football: {Team} formation in large partially-observable domains}
       \field{volume}{26}
       \field{year}{2012}
+    \endentry
+    \entry{keogh2023}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=3d3812fb81d463a169f2fda78b0fda1e}{%
+           family={Keogh},
+           familyi={K\bibinitperiod},
+           given={Paddy},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{3d3812fb81d463a169f2fda78b0fda1e}
+      \strng{fullhash}{3d3812fb81d463a169f2fda78b0fda1e}
+      \strng{bibnamehash}{3d3812fb81d463a169f2fda78b0fda1e}
+      \strng{authorbibnamehash}{3d3812fb81d463a169f2fda78b0fda1e}
+      \strng{authornamehash}{3d3812fb81d463a169f2fda78b0fda1e}
+      \strng{authorfullhash}{3d3812fb81d463a169f2fda78b0fda1e}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{https://www.attackingfootball.com/how-many-people-play-fantasy-premier-league-fpl/}
+      \field{title}{How Many People Play Fantasy Premier League (FPL)?}
+      \field{year}{2023}
     \endentry
     \entry{conn2017}{book}{}
       \name{author}{1}{}{%
@@ -71,8 +113,8 @@
       \strng{authorbibnamehash}{38ae4d396fa75119f5328db9dcc40c1d}
       \strng{authornamehash}{38ae4d396fa75119f5328db9dcc40c1d}
       \strng{authorfullhash}{38ae4d396fa75119f5328db9dcc40c1d}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{The Fall of the House of FIFA}
@@ -93,8 +135,8 @@
       \strng{authorbibnamehash}{225602381bd61b1619ef2e61888dcbae}
       \strng{authornamehash}{225602381bd61b1619ef2e61888dcbae}
       \strng{authorfullhash}{225602381bd61b1619ef2e61888dcbae}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Premier League Handbook 2023/24}
@@ -120,8 +162,8 @@
       \strng{authorbibnamehash}{652d78d02e7b06cac97e5434f9d44406}
       \strng{authornamehash}{652d78d02e7b06cac97e5434f9d44406}
       \strng{authorfullhash}{652d78d02e7b06cac97e5434f9d44406}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Journal of the Economics of Business}
@@ -156,8 +198,8 @@
       \strng{authorbibnamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
       \strng{authornamehash}{958b8d76e5f1dc076ea6a0b6cbb64613}
       \strng{authorfullhash}{958b8d76e5f1dc076ea6a0b6cbb64613}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Journal of Sport Policy and Politics}
@@ -190,8 +232,8 @@
       \strng{authorbibnamehash}{629b189f4b8eded96da0575b5bdbf6af}
       \strng{authornamehash}{629b189f4b8eded96da0575b5bdbf6af}
       \strng{authorfullhash}{629b189f4b8eded96da0575b5bdbf6af}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{National Pastime: How Americans Play Baseball and the Rest of the World Plays Soccer}
@@ -213,8 +255,8 @@
       \strng{authornamehash}{6b2757d2c251fac9f9c08989e869930e}
       \strng{authorfullhash}{6b2757d2c251fac9f9c08989e869930e}
       \field{extraname}{1}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Official Fantasy Premier League Participation Statistics}
@@ -245,8 +287,8 @@
       \strng{authorbibnamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
       \strng{authornamehash}{c1797b1115ad0e1b6640bfb3efe74cfe}
       \strng{authorfullhash}{c1797b1115ad0e1b6640bfb3efe74cfe}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{International Transactions in Operational Research}
@@ -496,8 +538,8 @@
       \strng{authorbibnamehash}{3b7f210f033a77b8fa310937f63c5c4c}
       \strng{authornamehash}{3b7f210f033a77b8fa310937f63c5c4c}
       \strng{authorfullhash}{f1d6643c766a105dbb490f98c7ec87c2}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{2014 IEEE International Conference on Data Mining}
@@ -531,8 +573,8 @@
       \strng{authorbibnamehash}{50a4b3c316491528df779c66d9e51c08}
       \strng{authornamehash}{50a4b3c316491528df779c66d9e51c08}
       \strng{authorfullhash}{50a4b3c316491528df779c66d9e51c08}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Journal of Sports Economics}
@@ -557,8 +599,8 @@
       \strng{authorbibnamehash}{67a9fc98f02000f40afc4f01377ef721}
       \strng{authornamehash}{67a9fc98f02000f40afc4f01377ef721}
       \strng{authorfullhash}{67a9fc98f02000f40afc4f01377ef721}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Journal of Quantitative Analysis in Sports}
@@ -1093,8 +1135,8 @@
       \strng{authorbibnamehash}{bb55b1b603362fbd54ec570284b360af}
       \strng{authornamehash}{bb55b1b603362fbd54ec570284b360af}
       \strng{authorfullhash}{cc588eadaa39c244fc0faa74989ec0f4}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Scientific Data}
@@ -1127,8 +1169,8 @@
       \strng{authorbibnamehash}{790e352fc95be182a678c2e1448cae0c}
       \strng{authornamehash}{790e352fc95be182a678c2e1448cae0c}
       \strng{authorfullhash}{790e352fc95be182a678c2e1448cae0c}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{Machine Learning and Knowledge Discovery in Databases: European Conference, ECML PKDD 2019}
@@ -1222,8 +1264,8 @@
       \strng{authorbibnamehash}{57c413a9e4ca863e81cbecf6ed0b5239}
       \strng{authornamehash}{57c413a9e4ca863e81cbecf6ed0b5239}
       \strng{authorfullhash}{57c413a9e4ca863e81cbecf6ed0b5239}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{howpublished}{https://fpl.readthedocs.io/en/latest/index.html}
@@ -1244,12 +1286,34 @@
       \strng{authorbibnamehash}{0638219e9f3a46e26480d3cdb2e6bb31}
       \strng{authornamehash}{0638219e9f3a46e26480d3cdb2e6bb31}
       \strng{authorfullhash}{0638219e9f3a46e26480d3cdb2e6bb31}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{howpublished}{https://www.fantasyfootballpundit.com/fpl-dream-team/}
       \field{title}{FPL Dream Team from Every Season}
+      \field{year}{2024}
+    \endentry
+    \entry{analyticsFC2024}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=8aa424c3e6dde26f3f5846ca8e40e0f8}{%
+           family={FC},
+           familyi={F\bibinitperiod},
+           given={Analytics},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{8aa424c3e6dde26f3f5846ca8e40e0f8}
+      \strng{fullhash}{8aa424c3e6dde26f3f5846ca8e40e0f8}
+      \strng{bibnamehash}{8aa424c3e6dde26f3f5846ca8e40e0f8}
+      \strng{authorbibnamehash}{8aa424c3e6dde26f3f5846ca8e40e0f8}
+      \strng{authornamehash}{8aa424c3e6dde26f3f5846ca8e40e0f8}
+      \strng{authorfullhash}{8aa424c3e6dde26f3f5846ca8e40e0f8}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{https://analyticsfc.co.uk/blog/2024/07/18/the-cost-of-injuries-in-the-premier-league-2023-2024/}
+      \field{title}{THE COST OF INJURIES IN THE PREMIER LEAGUE: 2023/2024}
       \field{year}{2024}
     \endentry
   \enddatalist

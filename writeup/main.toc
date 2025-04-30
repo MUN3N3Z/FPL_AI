@@ -28,28 +28,29 @@
 \contentsline {chapter}{\numberline {3}Methodology}{14}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Introduction to Methodology}{14}{section.3.1}%
 \contentsline {section}{\numberline {3.2}Modeling players' abilities}{14}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Modeling the FPL team selection problem}{17}{section.3.3}%
+\contentsline {section}{\numberline {3.3}Modeling the FPL team selection problem}{18}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}State Space}{18}{subsection.3.3.1}%
 \contentsline {subsection}{\numberline {3.3.2}Action Space}{19}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}Transition Dynamics}{20}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3.3.4}Reward Function}{20}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.3}Transition Dynamics}{21}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Reward Function}{21}{subsection.3.3.4}%
 \contentsline {section}{\numberline {3.4}Solving the FPL team selection Problem}{21}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Bayesian Q-Value Update}{21}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Value of Perfect Information (VPI)}{21}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.1}Bayesian Q-Value Update}{22}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Value of Perfect Information (VPI)}{22}{subsection.3.4.2}%
 \contentsline {subsection}{\numberline {3.4.3}Action Selection and Exploration}{22}{subsection.3.4.3}%
-\contentsline {subsection}{\numberline {3.4.4}Algorithm}{22}{subsection.3.4.4}%
-\contentsline {section}{\numberline {3.5}Data Collection Methods}{22}{section.3.5}%
+\contentsline {subsection}{\numberline {3.4.4}Algorithm}{23}{subsection.3.4.4}%
+\contentsline {section}{\numberline {3.5}Data Collection Methods}{23}{section.3.5}%
 \contentsline {section}{\numberline {3.6}Technology Stack}{23}{section.3.6}%
 \contentsline {subsection}{\numberline {3.6.1}Hardware Infrastructure}{23}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}Software framework}{23}{subsection.3.6.2}%
-\contentsline {subsection}{\numberline {3.6.3}Data Management}{23}{subsection.3.6.3}%
-\contentsline {subsection}{\numberline {3.6.4}Analysis \& Modeling}{23}{subsection.3.6.4}%
+\contentsline {subsection}{\numberline {3.6.2}Software framework}{24}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.3}Data Management}{24}{subsection.3.6.3}%
+\contentsline {subsection}{\numberline {3.6.4}Analysis \& Modeling}{24}{subsection.3.6.4}%
 \contentsline {subsection}{\numberline {3.6.5}Reproducibility Framework}{24}{subsection.3.6.5}%
 \contentsline {chapter}{\numberline {4}Results}{25}{chapter.4}%
-\contentsline {section}{\numberline {4.1}subsection}{25}{section.4.1}%
-\contentsline {section}{\numberline {4.2}How you should prepare figures}{25}{section.4.2}%
-\contentsline {section}{\numberline {4.3}In the Results section.. }{25}{section.4.3}%
-\contentsline {chapter}{\numberline {5}Related Work}{27}{chapter.5}%
-\contentsline {chapter}{\numberline {6}Conclusions}{28}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Future Work}{29}{chapter.7}%
-\contentsline {chapter}{\numberline {A}Appendix Title}{33}{appendix.A}%
+\contentsline {section}{\numberline {4.1}Introduction}{25}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Agent Performance Overview}{25}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Gameweek-by-Gameweek Analysis}{25}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Algorithm Analysis}{26}{section.4.4}%
+\contentsline {chapter}{\numberline {5}Related Work}{30}{chapter.5}%
+\contentsline {chapter}{\numberline {6}Conclusion}{31}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Future Work}{32}{chapter.7}%
+\contentsline {chapter}{\numberline {A}Appendix Title}{36}{appendix.A}%

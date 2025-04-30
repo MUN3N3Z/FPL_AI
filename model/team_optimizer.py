@@ -1,14 +1,155 @@
 import pandas as pd
 import numpy as np
 import pulp
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from utils import get_logger
+import pickle
+import os
+from constants import DATA_FOLDER
+from utils import format_season_name
+from data_registry import DataRegistry
 
 logger = get_logger(__name__)
 
 
+def impute_missing_player_data(
+    missing_players: List[str],
+    player_df: pd.DataFrame,
+    season_start_year: str,
+    current_gameweek: str,
+):
+    """
+    Impute data for missing players.
+
+    Parameters:
+    -----------
+    missing_players : list
+        - List of player IDs missing from the player_df
+    player_df : DataFrame
+        - Current player dataframe with available player data
+    season_start_year: str
+    current_gameweek: str
+
+    Returns:
+    --------
+    DataFrame
+        - DataFrame with imputed player data added
+    """
+    # Attempt to load previous gameweek's pickled players' performance data
+    previous_gameweek_points_df: pd.DataFrame | None = None
+    previous_gameweek_data_registry: pd.DataFrame | None = None
+    season_folder = format_season_name(season_start_year)
+    if int(current_gameweek) > 1:
+        try:
+            # Load data registry
+            data_registry = DataRegistry(
+                gw_data_columns=["team", "position", "GW", "price", "name"]
+            )
+            previous_gameweek_data_registry = data_registry.gameweek_data[season_folder]
+            previous_gameweek_data_registry = previous_gameweek_data_registry[
+                previous_gameweek_data_registry["GW"] == int(current_gameweek) - 1
+            ]
+            previous_gameweek_data_registry.set_index("name", inplace=True)
+        except Exception as e:
+            logger.warning(
+                f"(imputation) Error loading previous gameweek's real data: {e}"
+            )
+
+        try:
+            # Load previous gameweek points
+            previous_gameweek = str(int(current_gameweek) - 1)
+            file_path = os.path.join(
+                DATA_FOLDER,
+                season_folder,
+                "model_data",
+                f"player_points_{previous_gameweek}.pkl",
+            )
+            with open(file=file_path, mode="rb") as f:
+                previous_gameweek_points_df = pickle.load(f)
+        except Exception as e:
+            logger.warning(
+                f"(imputation) Error loading previous gameweek's sampled data: {e}"
+            )
+
+    imputed_data = []
+    for player_id in missing_players:
+        # First try to get data from previous sampled_data if available
+        if (
+            previous_gameweek_points_df is not None
+            and player_id in previous_gameweek_points_df.index
+        ):
+            player_historic = previous_gameweek_points_df.loc[player_id, :].filter(
+                ["team", "position", "price", "sampled_points"]
+            )
+            # Use recent data but discount expected points by 10%
+            player_data = player_historic.copy()
+            player_data["sampled_points"] = (
+                player_data["sampled_points"] * 0.9
+            )  # Discount for uncertainty
+            logger.info(
+                f"Successfully imputed data for {player_id} using previous gameweek sampled data"
+            )
+            imputed_data.append(pd.DataFrame(player_data))
+
+        # If no previous gameweek data, use position-based median
+        elif (
+            previous_gameweek_data_registry is not None
+            and player_id in previous_gameweek_data_registry.index
+        ):
+            try:
+                player_row = previous_gameweek_data_registry.loc[player_id, :]
+                # Extract player position and team
+                player_position = player_row["position"]
+                player_team = player_row["team"]
+                player_price = player_row["price"]
+                # Get similar players (same position and similar price range)
+                similar_players = player_df[
+                    (player_df["position"] == player_position)
+                    & (player_df["team"] == player_team)
+                ]
+
+                if len(similar_players) > 0:
+                    # Use the median values from similar players
+                    median_points = similar_players["total_points"].median()
+                    # Create imputed player data
+                    player_data = pd.DataFrame(
+                        {
+                            "index": player_id,
+                            "position": player_position,
+                            "team": player_team,
+                            "price": player_price,
+                            "sampled_points": (
+                                median_points * 0.8
+                            ),  # Discount for uncertainty
+                        }
+                    ).set_index("index")
+                    imputed_data.append(player_data)
+                    logger.info(
+                        f"Successfully imputed data for {player_id} using previous gameweek historical data"
+                    )
+            except Exception as e:
+                logger.warning(
+                    f"Error imputing data for player {player_id} from data registry: {e}"
+                )
+        else:
+            logger.warning(
+                f"(impute_missing_player_data) Could not impute data for {player_id}!"
+            )
+
+    # Create DataFrame from imputed data
+    if imputed_data:
+        # Combine with original DataFrame
+        imputed_data.append(player_df)
+        combined_df = pd.concat(imputed_data)
+        return combined_df
+
+    return player_df
+
+
 def generate_fpl_team(
     player_df: pd.DataFrame,
+    season_start_year,
+    current_gameweek,
     budget=100.0,
     current_team=None,
     free_transfers=1,
@@ -40,41 +181,48 @@ def generate_fpl_team(
     dict
         Dictionary containing selected team information
     """
+    # Drop unused columns
+    player_df = player_df.filter(["team", "position", "price", "sampled_points"])
     # First, handle the case where players in current_team are not in player_df
     missing_players = []
     valid_current_team = None
+    player_df_index = set(player_df.index)
 
     if current_team is not None:
         # Check if all current team players are in the dataframe
-        missing_players = [p for p in current_team if p not in player_df.index]
-
+        missing_players = [p for p in current_team if p not in player_df_index]
         if missing_players:
             logger.warning(
-                f"The following players from your current team are not in the available players: {missing_players}"
+                f"The following players from your current team are not in the available players: {missing_players}\nAttempting to impute their data ..."
             )
-
-            # Filter out missing players from current_team
-            valid_current_team = [p for p in current_team if p in player_df.index]
-
-            # If all players are missing, treat as new team
-            if len(valid_current_team) == 0:
+            # Attempt to impute missing players' data
+            player_df = impute_missing_player_data(
+                missing_players, player_df, season_start_year, current_gameweek
+            )
+            player_df_index = set(player_df.index)
+            # Update list of missing players after imputation
+            missing_players = [p for p in current_team if p not in player_df_index]
+            if missing_players:
                 logger.warning(
-                    "No valid players remain in current team. Treating as a new team selection."
+                    f"Could not impute data for these players: {missing_players}"
                 )
-                valid_current_team = None
+                # Filter out still-missing players from current_team
+                valid_current_team = [p for p in current_team if p in player_df_index]
+            else:
+                valid_current_team = current_team
         else:
             valid_current_team = (
                 current_team.copy()
                 if isinstance(current_team, list)
                 else list(current_team)
             )
-
     # Enforce unique players
     player_df = player_df.sort_values(by="sampled_points", ascending=False)
     player_df = (
-        player_df.reset_index().drop_duplicates(subset=["index"]).set_index("index")
+        player_df.reset_index()
+        .drop_duplicates(subset=["index"])
+        .set_index("index", drop=True)
     )
-
     # Create the PuLP model
     model = pulp.LpProblem(name="FPL_Team_Selection", sense=pulp.LpMaximize)
 
@@ -277,14 +425,26 @@ def generate_fpl_team(
             == pulp.lpSum([1 - x[player_id] for player_id in valid_current_team]),
             "actual_transfers_count",
         )
-
-        # Only one discretionary transfer (the rest are forced due to missing players)
-        # Note: We use '<=1' instead of '==1' to allow for no discretionary transfers if needed
-        model += (
-            discretionary_transfers <= 1,
-            "max_discretionary_transfers",
-        )
-
+        if free_transfers > 0:
+            model += (
+                discretionary_transfers <= free_transfers,
+                "max_discretionary_transfer",
+            )
+            # Add constraint to make it 0 or 1 (binary)
+            model += (
+                pulp.lpSum([1 - x[player_id] for player_id in valid_current_team]) <= 1,
+                "enforce_max_free_discretionary_transfer",
+            )
+        else:
+            # If no free transfers, force 0 transfers
+            model += (
+                discretionary_transfers == 0,
+                "no_discretionary_transfers",
+            )
+            model += (
+                pulp.lpSum([1 - x[player_id] for player_id in valid_current_team]) == 0,
+                "enforce_no_transfers",
+            )
         # Discretionary transfers can't exceed actual transfers
         model += (
             discretionary_transfers <= actual_transfers,
@@ -441,6 +601,8 @@ def generate_fpl_team(
 
 def generate_multiple_teams(
     player_df,
+    season_start_year: str,
+    current_gameweek: str,
     num_teams=3,
     samples_per_team=20,
     budget=100.0,
@@ -506,6 +668,8 @@ def generate_multiple_teams(
             # Generate team with this sample
             team = generate_fpl_team(
                 sampled_df,
+                season_start_year,
+                current_gameweek,
                 budget=budget,
                 current_team=current_team,
                 free_transfers=free_transfers,
@@ -542,6 +706,8 @@ def generate_multiple_teams(
                 # Generate team without current squad constraints
                 team = generate_fpl_team(
                     sampled_df,
+                    season_start_year,
+                    current_gameweek,
                     budget=budget,
                     current_team=None,  # No current team constraint
                     free_transfers=free_transfers,
@@ -562,6 +728,8 @@ def generate_multiple_teams(
             # Try one more time with simplified constraints
             team = generate_fpl_team(
                 player_df,
+                season_start_year,
+                current_gameweek,
                 budget=budget + 5,  # Slightly relaxed budget
                 current_team=None,  # No current team constraint
                 free_transfers=free_transfers,

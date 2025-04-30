@@ -164,9 +164,12 @@ class FPLEnv(gym.Env):
             # Initialize team using MKP approach
             teams = generate_multiple_teams(
                 player_df=player_points_gw,
+                season_start_year=self.season_start_year,
+                current_gameweek=self.current_gameweek,
                 num_teams=3,
                 samples_per_team=20,
                 budget=self.budget,
+                free_transfers=self.available_transfers,
             )
 
             if teams:
@@ -226,10 +229,11 @@ class FPLEnv(gym.Env):
         # Calculate transfers made
         transfers_made = 0
         if self.current_team:
+            selected_team_squad_set = set(selected_team["squad"])
             players_out = [
-                p for p in self.current_team if p not in selected_team["squad"]
+                p for p in self.current_team if p not in selected_team_squad_set
             ]
-            transfers_made = len(players_out)
+            transfers_made = 1
 
         # Calculate transfer penalties
         transfer_penalty = 0
@@ -288,7 +292,7 @@ class FPLEnv(gym.Env):
             "transfer_penalty": transfer_penalty,
             "available_transfers": self.available_transfers,
         }
-
+        # self.render()
         return observation, actual_points, done, False, info
 
     def _get_observation(self) -> Dict[str, np.ndarray]:
@@ -366,6 +370,8 @@ class FPLEnv(gym.Env):
         # Generate multiple teams using MKP
         teams = generate_multiple_teams(
             player_df=player_points_df,
+            season_start_year=self.season_start_year,
+            current_gameweek=self.current_gameweek,
             num_teams=3,
             samples_per_team=20,
             budget=self.budget,
@@ -389,9 +395,6 @@ class FPLEnv(gym.Env):
             if self.current_team:
                 logger.info("\nCurrent Team:")
                 for player_name in self.current_team:
-                    player_data = self.players_ability_data[
-                        self.players_ability_data["name"] == player_name
-                    ]
                     captain_mark = (
                         " (C)"
                         if player_name == self.captain_id

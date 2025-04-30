@@ -4,6 +4,8 @@ from scipy.stats import norm
 from collections import defaultdict
 from fpl_env import FPLEnv
 from utils import get_logger
+import numpy as np
+from constants import GAMEWEEK_COUNT
 
 # Module logger
 logger = get_logger(__name__)
@@ -23,7 +25,6 @@ class BayesianQLearningAgent:
     def __init__(
         self,
         discount_factor: float = 0.5,
-        search_depth: int = 3,
         init_variance_ratio: float = 0.1,
         episode_limit: int = 50,
         num_actions: int = 3,
@@ -33,13 +34,11 @@ class BayesianQLearningAgent:
 
         Args:
             discount_factor: Discount factor for future rewards (γ)
-            search_depth: Maximum recursion depth for Q-value estimation
             init_variance_ratio: Proportion of mean used to set initial variance (θ)
             episode_limit: Maximum number of episodes to run
             num_actions: Number of candidate actions to maintain
         """
         self.gamma = discount_factor
-        self.search_depth = search_depth
         self.theta = init_variance_ratio
         self.episode_limit = episode_limit
         self.num_actions = num_actions
@@ -232,12 +231,14 @@ class BayesianQLearningAgent:
             episode_rewards: List of total rewards per episode
         """
         episode_rewards = []
+        gameweek_rewards = np.zeros(shape=(GAMEWEEK_COUNT,))
 
         for episode in range(num_episodes):
             self.current_episode = episode
             total_reward = 0
             state, _ = env.reset()
             done = False
+            episode_gameweek_rewards = []
 
             while not done:
                 # Generate candidate actions if needed
@@ -265,17 +266,20 @@ class BayesianQLearningAgent:
                 # Update state and accumulate reward
                 state = next_state
                 total_reward += reward
+                episode_gameweek_rewards.append(reward)
 
             # Record episode performance
             episode_rewards.append(total_reward)
             self.episode_rewards.append(total_reward)
             self.cumulative_reward += total_reward
+            gameweek_rewards += np.array(episode_gameweek_rewards)
 
             logger.info(
                 f"Episode {episode+1}/{num_episodes} - Total points: {total_reward} - Cumulative points: {self.cumulative_reward}"
             )
+        gameweek_rewards = list((gameweek_rewards / num_episodes).astype(int))
 
-        return episode_rewards
+        return episode_rewards, gameweek_rewards
 
     def _calculate_vpi(
         self,
@@ -399,6 +403,7 @@ class BayesianQLearningAgent:
         done = False
         total_points = 0
         decisions = []
+        gameweek_rewards = []
 
         while not done:
             # Generate candidate actions
@@ -435,9 +440,10 @@ class BayesianQLearningAgent:
             # Update state and accumulate reward
             state = next_state
             total_points += reward
+            gameweek_rewards.append(reward)
 
             logger.info(
                 f"Gameweek {info['gameweek']-1} - Points: {reward} - Total: {total_points}"
             )
 
-        return total_points, decisions
+        return total_points, decisions, gameweek_rewards

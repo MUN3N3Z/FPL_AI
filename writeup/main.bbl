@@ -1230,37 +1230,27 @@
       \field{title}{A Python wrapper for the Fantasy Premier League API}
       \field{year}{2019}
     \endentry
-    \entry{hosseini2016adaptive}{inproceedings}{}
-      \name{author}{2}{}{%
-        {{hash=4ecd913d5ba7c72727e6e0b239d935a2}{%
-           family={Hosseini},
-           familyi={H\bibinitperiod},
-           given={Mohammad},
-           giveni={M\bibinitperiod}}}%
-        {{hash=a6c51a0e9d3a8edd919d87e245749d3d}{%
-           family={Swaminathan},
-           familyi={S\bibinitperiod},
-           given={Viswanathan},
-           giveni={V\bibinitperiod}}}%
+    \entry{fantasyfootballpundit2024}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=0638219e9f3a46e26480d3cdb2e6bb31}{%
+           family={Pundit},
+           familyi={P\bibinitperiod},
+           given={Fantasy\bibnamedelima Football},
+           giveni={F\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
       }
-      \list{organization}{1}{%
-        {IEEE}%
-      }
-      \strng{namehash}{f400ca7cb692ed8829fc50472bf33711}
-      \strng{fullhash}{f400ca7cb692ed8829fc50472bf33711}
-      \strng{bibnamehash}{f400ca7cb692ed8829fc50472bf33711}
-      \strng{authorbibnamehash}{f400ca7cb692ed8829fc50472bf33711}
-      \strng{authornamehash}{f400ca7cb692ed8829fc50472bf33711}
-      \strng{authorfullhash}{f400ca7cb692ed8829fc50472bf33711}
+      \strng{namehash}{0638219e9f3a46e26480d3cdb2e6bb31}
+      \strng{fullhash}{0638219e9f3a46e26480d3cdb2e6bb31}
+      \strng{bibnamehash}{0638219e9f3a46e26480d3cdb2e6bb31}
+      \strng{authorbibnamehash}{0638219e9f3a46e26480d3cdb2e6bb31}
+      \strng{authornamehash}{0638219e9f3a46e26480d3cdb2e6bb31}
+      \strng{authorfullhash}{0638219e9f3a46e26480d3cdb2e6bb31}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{booktitle}{2016 IEEE International Symposium on Multimedia (ISM)}
-      \field{title}{Adaptive 360 VR video streaming: Divide and conquer}
-      \field{year}{2016}
-      \field{pages}{107\bibrangedash 110}
-      \range{pages}{4}
+      \field{howpublished}{https://www.fantasyfootballpundit.com/fpl-dream-team/}
+      \field{title}{FPL Dream Team from Every Season}
+      \field{year}{2024}
     \endentry
   \enddatalist
 \endrefsection
